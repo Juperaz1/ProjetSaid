@@ -1,9 +1,10 @@
-
 services:
 ###> doctrine/doctrine-bundle ###
-  database:
+  db:  # Changé de "database" à "db" pour correspondre à votre config
     ports:
-      - "5432"
+      - "5432"  # Gardez ce port si vous voulez exposer PostgreSQL
+      # Ou changez pour MySQL/MariaDB :
+      # - "3306"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
