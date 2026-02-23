@@ -7,11 +7,46 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
+# config/routes.yaml
+
+# Routes principales
 app_home:
     path: /
-    controller: App\Controller\HomeController::index
+    controller: App\Controller\MissionController::index
     methods: GET
 
+app_missions_index:
+    path: /missions
+    controller: App\Controller\MissionController::index
+    methods: GET
+
+app_mission_show:
+    path: /mission/{id}
+    controller: App\Controller\MissionController::show
+    requirements:
+        id: '\d+'
+    methods: GET
+
+app_missions_filter:
+    path: /missions/filter
+    controller: App\Controller\MissionController::filter
+    methods: GET
+
+# Routes d'authentification (de votre LoginController)
+app_login:
+    path: /connexion
+    controller: App\Controller\LoginController::login
+    methods: [GET, POST]
+
+app_logout:
+    path: /deconnexion
+    controller: App\Controller\LoginController::logout
+    methods: GET
+
+app_register:
+    path: /inscription
+    controller: App\Controller\RegistrationController::register
+    methods: [GET, POST]
 
 controllers:
     resource: ../src/Controller/

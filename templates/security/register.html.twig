@@ -1,0 +1,631 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - Tableau de Bord{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* ===== PAGE D'INSCRIPTION ===== */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .py-5 {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -15px;
+    }
+
+    .justify-content-center {
+        justify-content: center;
+    }
+
+    .col-md-8, .col-lg-6 {
+        padding: 0 15px;
+    }
+
+    .col-md-8 {
+        flex: 0 0 66.666667%;
+        max-width: 66.666667%;
+    }
+
+    .col-lg-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    @media (max-width: 768px) {
+        .col-md-8 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .col-lg-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    /* ===== EN-TÊTE ===== */
+    .text-center {
+        text-align: center;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    .display-5 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .fw-bold {
+        font-weight: 700;
+    }
+
+    .text-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .lead {
+        font-size: 1.2rem;
+        font-weight: 400;
+        color: var(--gray-color);
+    }
+
+    /* ===== CARTE ===== */
+    .card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+        animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    .card-body {
+        padding: 2.5rem;
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+        color: var(--dark-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-weight: 600;
+    }
+
+    .card-title i {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
+    }
+
+    /* ===== ALERTES ===== */
+    .alert {
+        padding: 1rem 1.5rem;
+        border-radius: 14px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideDown 0.3s ease;
+        font-weight: 500;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-success {
+        background: #e3faf5;
+        border: 1px solid var(--success-color);
+        color: #0b5e4a;
+    }
+
+    .alert-danger {
+        background: #fee;
+        border: 1px solid var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .alert i {
+        font-size: 1.25rem;
+    }
+
+    .btn-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        color: inherit;
+        opacity: 0.5;
+        transition: var(--transition);
+    }
+
+    .btn-close:hover {
+        opacity: 1;
+    }
+
+    /* ===== FORMULAIRE ===== */
+    .mb-3, .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: var(--primary-color);
+        margin-right: 0.5rem;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .input-group-text {
+        padding: 0.9rem 1.2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        border-radius: 14px 0 0 14px;
+        font-size: 1rem;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 14px 14px 0;
+        border-left: none;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 14px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: var(--light-gray);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-text {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--gray-color);
+    }
+
+    /* ===== CHECKBOX ===== */
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .form-check-input {
+        width: 1.25rem;
+        height: 1.25rem;
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: var(--transition);
+        accent-color: var(--primary-color);
+    }
+
+    .form-check-input:checked {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-check-label {
+        color: var(--dark-color);
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    /* ===== BOUTON ===== */
+    .d-grid {
+        display: grid;
+    }
+
+    .gap-2 {
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 1rem;
+        border: none;
+        border-radius: 14px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+    }
+
+    .btn-lg {
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    /* ===== ERREURS DE FORMULAIRE ===== */
+    .form-error {
+        color: var(--danger-color);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: rgba(239, 71, 111, 0.05);
+        border-radius: 8px;
+        border-left: 3px solid var(--danger-color);
+        font-weight: 500;
+    }
+
+    /* ===== LIEN DE CONNEXION ===== */
+    .mt-4 {
+        margin-top: 2rem;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    .text-decoration-none {
+        text-decoration: none;
+    }
+
+    .fw-bold {
+        font-weight: 700;
+    }
+
+    .ms-1 {
+        margin-left: 0.25rem;
+    }
+
+    .text-primary {
+        color: var(--primary-color);
+    }
+
+    /* ===== STATISTIQUES ===== */
+    .row.mt-4 {
+        margin-top: 2.5rem;
+    }
+
+    .col-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+        padding: 0 15px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+        animation: fadeInUp 0.5s ease backwards;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        box-shadow: 0 8px 15px rgba(67, 97, 238, 0.2);
+    }
+
+    .stat-card .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card .stat-label {
+        color: var(--gray-color);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .display-5 {
+            font-size: 2rem;
+        }
+
+        .lead {
+            font-size: 1rem;
+        }
+
+        .col-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            padding: 1rem;
+        }
+
+        .stat-card .stat-icon {
+            margin: 0 1rem 0 0;
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.5rem;
+            margin-bottom: 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+        }
+
+        .btn-lg {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold text-primary">Créer un compte</h1>
+                <p class="lead">
+                    Rejoignez notre plateforme de gestion de missions
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-4 p-lg-5">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Inscription
+                    </h2>
+                    
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label == 'error' ? 'danger' : 'success' }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ label == 'error' ? 'exclamation-circle' : 'check-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Email professionnel
+                            </label>
+                            <input type="email" 
+                                   id="email" 
+                                   name="email" 
+                                   class="form-control" 
+                                   placeholder="votre@email.com" 
+                                   required>
+                            <div class="form-text">Votre email professionnel</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.login, 'Nom d\'utilisateur', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                {{ form_widget(registrationForm.login, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Choisissez un nom d\'utilisateur'
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_errors(registrationForm.login, {'attr': {'class': 'form-error'}}) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                {{ form_widget(registrationForm.plainPassword, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Minimum 6 caractères'
+                                    }
+                                }) }}
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword, {'attr': {'class': 'form-error'}}) }}
+                            <div class="form-text">Le mot de passe doit contenir au moins 6 caractères</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form_widget(registrationForm.agreeTerms, {
+                                    'attr': {'class': 'form-check-input'}
+                                }) }}
+                                {{ form_label(registrationForm.agreeTerms, 'J\'accepte les conditions d\'utilisation', {
+                                    'label_attr': {'class': 'form-check-label'}
+                                }) }}
+                            </div>
+                            {{ form_errors(registrationForm.agreeTerms, {'attr': {'class': 'form-error'}}) }}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>
+                                S'inscrire
+                            </button>
+                        </div>
+                    {{ form_end(registrationForm) }}
+                    
+                    <div class="mt-4 text-center">
+                        <p class="text-muted mb-0">
+                            Déjà inscrit ? 
+                            <a href="{{ path('app_login') }}" class="text-primary fw-bold text-decoration-none">
+                                Se connecter <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4 text-center">
+                <div class="col-4">
+                    <div class="stat-card">
+                        <i class="fas fa-chart-bar stat-icon"></i>
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">Statistiques</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-card">
+                        <i class="fas fa-tasks stat-icon"></i>
+                        <div class="stat-number">25</div>
+                        <div class="stat-label">Missions</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-card">
+                        <i class="fas fa-users stat-icon"></i>
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Salariés</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

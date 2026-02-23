@@ -1,60 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Accueil - Gestion de missions</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-        p {
-            color: #666;
-            line-height: 1.6;
-        }
-        .info {
-            background-color: #e7f3ff;
-            border-left: 4px solid #007bff;
-            padding: 15px;
-            margin: 20px 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Bienvenue sur l'application de gestion de missions</h1>
-        
-        <div class="info">
-            <strong>Page d'accueil en construction</strong>
-            <p>Les fonctionnalités suivantes seront bientôt disponibles :</p>
-            <ul>
-                <li>Création de missions</li>
-                <li>Gestion des clients</li>
-                <li>Saisie des temps</li>
-                <li>Tableau de bord</li>
-                <li>Et plus encore...</li>
-            </ul>
-        </div>
+{% extends 'base.html.twig' %}
 
-        <p>Pour l'instant, tu peux accéder à :</p>
-        <ul>
-            <li><a href="/login">Connexion</a> (quand l'authentification sera configurée)</li>
-        </ul>
+{% block title %}Accueil - Application{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="jumbotron bg-light p-5 rounded">
+                <h1 class="display-4">Bienvenue sur l'Application</h1>
+                
+                {% if app.user %}
+                    <p class="lead">
+                        Bonjour {{ app.user.employe.prenom }} {{ app.user.employe.nom }} !
+                    </p>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mon profil</h5>
+                                    <p class="card-text">
+                                        <strong>Email:</strong> {{ app.user.employe.email }}<br>
+                                        <strong>Site:</strong> {{ app.user.employe.site.villeSite ?? 'Non assigné' }}<br>
+                                        <strong>Rôle:</strong> 
+                                        {% if 'ROLE_RESPONSABLE' in app.user.roles %}
+                                            Responsable
+                                        {% else %}
+                                            Employé
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mes missions</h5>
+                                    <p class="card-text">Consultez et gérez vos missions en cours</p>
+                                    <a href="#" class="btn btn-primary">Voir mes missions</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mes feuilles de temps</h5>
+                                    <p class="card-text">Saisissez et suivez vos feuilles de temps</p>
+                                    <a href="#" class="btn btn-primary">Voir mes feuilles</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="lead">
+                        Veuillez vous connecter pour accéder à l'application.
+                    </p>
+                    <hr class="my-4">
+                    <p>
+                        <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg">Se connecter</a>
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-primary btn-lg">S'inscrire</a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
