@@ -1,288 +1,312 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Missions - Tableau de Bord{% endblock %}
-
+{% block title %}
+    Missions - Tableau de Bord
+{% endblock %}
 {% block body %}
-<div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="display-6 fw-bold text-primary">
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h2 fw-bold text-primary">
                         <i class="fas fa-rocket me-3"></i>Tableau de Bord des Missions
                     </h1>
-                    <p class="text-muted">
-                        <i class="fas fa-calendar-alt me-2"></i>
-                        {{ 'now'|date('l d F Y')|capitalize }}
-                    </p>
+                    <div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter me-2"></i>Filtrer
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 300px;">
+                                <li>
+                                    <h6 class="dropdown-header"><i class="fas fa-sliders-h me-2"></i>Filtrer les missions</h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="px-3">
+                                    <label class="form-label">Client</label>
+                                    <select class="form-select form-select-sm mb-3" id="filterClient">
+                                        <option value="">Tous les clients</option>
+                                        {% for client in clients %}
+                                        <option value="{{ client.id }}">{{ client.nomClient }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </li>
+                                <li class="px-3">
+                                    <label class="form-label">Type de mission</label>
+                                    <select class="form-select form-select-sm mb-3" id="filterType">
+                                        <option value="">Tous les types</option>
+                                        {% for type in types %}
+                                        <option value="{{ type.id }}">{{ type.libelleTypeMission }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </li>
+                                <li class="px-3">
+                                    <label class="form-label">Statut</label>
+                                    <select class="form-select form-select-sm mb-3" id="filterStatut">
+                                        <option value="">Tous les statuts</option>
+                                        <option value="en cours">En cours</option>
+                                        <option value="prévue">Prévue</option>
+                                        <option value="terminée">Terminée</option>
+                                        <option value="en pause">En pause</option>
+                                        <option value="annulée">Annulée</option>
+                                    </select>
+                                </li>
+                                <li class="px-3">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label">Date début</label>
+                                            <input type="date" class="form-control form-control-sm" id="filterDateDebut">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label">Date fin</label>
+                                            <input type="date" class="form-control form-control-sm" id="filterDateFin">
+                                        </div>
+                                    </div>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="px-3">
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-light btn-sm flex-grow-1" id="resetFilters">Réinitialiser</button>
+                                        <button type="button" class="btn btn-primary btn-sm flex-grow-1" id="applyFilters">Appliquer</button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="{{ path('app_mission_creer') }}" class="btn btn-primary ms-2">
+                            <i class="fas fa-plus-circle me-2"></i>Nouvelle Mission
+                        </a>
+                    </div>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
-                        <i class="fas fa-filter me-2"></i>Filtrer
-                    </button>
-                    <a href="#" class="btn btn-primary">
-                        <i class="fas fa-plus-circle me-2"></i>Nouvelle Mission
-                    </a>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="small text-muted mb-1">Total Missions</p>
+                                <h3 class="fw-bold mb-0">{{ stats.total }}</h3>
+                            </div>
+                            <div class="bg-primary bg-opacity-25 rounded-circle p-3">
+                                <i class="fas fa-briefcase text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="small text-muted mb-1">En Cours</p>
+                                <h3 class="fw-bold mb-0">{{ stats.en_cours }}</h3>
+                            </div>
+                            <div class="bg-warning bg-opacity-25 rounded-circle p-3">
+                                <i class="fas fa-spinner text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="small text-muted mb-1">Prévues</p>
+                                <h3 class="fw-bold mb-0">{{ stats.prevues }}</h3>
+                            </div>
+                            <div class="bg-info bg-opacity-25 rounded-circle p-3">
+                                <i class="fas fa-clock text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="small text-muted mb-1">Terminées</p>
+                                <h3 class="fw-bold mb-0">{{ stats.terminees }}</h3>
+                            </div>
+                            <div class="bg-success bg-opacity-25 rounded-circle p-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-list me-2 text-primary"></i>Liste des Missions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">N° Mission</th>
+                                <th>Client</th>
+                                <th>Type</th>
+                                <th>Responsable</th>
+                                <th>Dates</th>
+                                <th>Budget</th>
+                                <th>Statut</th>
+                                <th>Avancement</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mission in missions %}
+                            <tr>
+                                <td class="ps-4 fw-semibold">{{ mission.noMission }}</td>
+                                <td>{{ mission.client.nomClient }}</td>
+                                <td>
+                                    <span class="badge bg-info bg-opacity-25 text-info px-3 py-2">
+                                        {{ mission.typeMission.libelleTypeMission }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if mission.responsable %}
+                                        {{ mission.responsable.prenomEmploye }} {{ mission.responsable.nomEmploye }}
+                                    {% else %}
+                                        <span class="text-muted fst-italic">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div><small class="text-muted">Début:</small> {{ mission.dateDebut|date('d/m/Y') }}</div>
+                                    <div><small class="text-muted">Fin:</small> {{ mission.dateFinPrevue|date('d/m/Y') }}</div>
+                                </td>
+                                <td>
+                                    <div><strong>{{ mission.budgetEuro|number_format(0, ',', ' ') }} €</strong></div>
+                                    <small class="text-muted">{{ mission.budgetHeures }}h</small>
+                                </td>
+                                <td>
+                                    {% if mission.statut == 'en cours' %}
+                                        <span class="badge bg-warning">EN COURS</span>
+                                    {% elseif mission.statut == 'prévue' %}
+                                        <span class="badge bg-info">PRÉVUE</span>
+                                    {% elseif mission.statut == 'terminée' %}
+                                        <span class="badge bg-success">TERMINÉE</span>
+                                    {% elseif mission.statut == 'en pause' %}
+                                        <span class="badge bg-secondary">EN PAUSE</span>
+                                    {% elseif mission.statut == 'annulée' %}
+                                        <span class="badge bg-danger">ANNULÉE</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ mission.statut|upper }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" style="width: {{ mission.avancementPourcentage }}%"></div>
+                                        </div>
+                                        <span class="ms-2 small">{{ mission.avancementPourcentage }}%</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ path('app_mission_show', {'id': mission.id}) }}" class="btn btn-outline-primary" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_mission_edit', {'id': mission.id}) }}" class="btn btn-outline-secondary" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" title="Supprimer" data-bs-toggle="modal" data-bs-target="#deleteModal" data-url="/mission/{{ mission.id }}/delete" data-mission="{{ mission.noMission }}" data-token="{{ csrf_token('delete' ~ mission.id) }}" onclick="setDeleteData(this)">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center py-5">
+                                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Aucune mission trouvée</p>
+                                    <a href="{{ path('app_mission_creer') }}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-2"></i>Créer une mission
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Total Missions</div>
-                        <div class="stat-number">{{ stats.total }}</div>
-                    </div>
-                    <div class="stat-icon bg-primary bg-opacity-10">
-                        <i class="fas fa-briefcase text-primary"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">En Cours</div>
-                        <div class="stat-number">{{ stats.en_cours }}</div>
-                    </div>
-                    <div class="stat-icon bg-warning bg-opacity-10">
-                        <i class="fas fa-spinner text-warning"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Prévues</div>
-                        <div class="stat-number">{{ stats.prevues }}</div>
-                    </div>
-                    <div class="stat-icon bg-info bg-opacity-10">
-                        <i class="fas fa-clock text-info"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stat-card">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="stat-label">Terminées</div>
-                        <div class="stat-number">{{ stats.terminees }}</div>
-                    </div>
-                    <div class="stat-icon bg-success bg-opacity-10">
-                        <i class="fas fa-check-circle text-success"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h5 class="mb-0">
-                        <i class="fas fa-list me-2 text-primary"></i>
-                        Liste des Missions
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                        Confirmer la suppression
                     </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                        <input type="text" class="form-control border-start-0" 
-                               placeholder="Rechercher une mission..." id="searchMission">
-                    </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer la mission <strong id="missionNo"></strong> ?</p>
+                    <p class="text-muted small">Cette action est irréversible.</p>
                 </div>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">N° Mission</th>
-                            <th>Client</th>
-                            <th>Type</th>
-                            <th>Responsable</th>
-                            <th>Dates</th>
-                            <th>Budget</th>
-                            <th>Statut</th>
-                            <th>Avancement</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for mission in missions %}
-                        <tr>
-                            <td class="ps-4">
-                                <span class="fw-semibold">{{ mission.noMission }}</span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm bg-light rounded-circle me-2">
-                                        <i class="fas fa-building text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <div>{{ mission.client.nomClient }}</div>
-                                        <small class="text-muted">{{ mission.client.siretClient|slice(0,8) }}...</small>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">
-                                    {{ mission.typeMission.libelleTypeMission }}
-                                </span>
-                            </td>
-                            <td>
-                                {% if mission.responsable %}
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-xs bg-secondary bg-opacity-10 rounded-circle me-2">
-                                        <i class="fas fa-user-tie text-secondary"></i>
-                                    </div>
-                                    {{ mission.responsable.fullName }}
-                                </div>
-                                {% else %}
-                                <span class="text-muted">Non assigné</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <div><small class="text-muted">Début:</small> {{ mission.dateDebut|date('d/m/Y') }}</div>
-                                <div><small class="text-muted">Fin:</small> {{ mission.dateFinPrevue|date('d/m/Y') }}</div>
-                            </td>
-                            <td>
-                                <div><strong>{{ mission.budgetEuro|number_format(0, ',', ' ') }} €</strong></div>
-                                <small class="text-muted">{{ mission.budgetHeures }}h</small>
-                            </td>
-                            <td>
-                                {% set statusColor = {
-                                    'en cours': 'warning',
-                                    'prévue': 'info',
-                                    'terminée': 'success',
-                                    'en pause': 'secondary',
-                                    'annulée': 'danger'
-                                } %}
-                                <span class="badge bg-{{ statusColor[mission.statut]|default('secondary') }} px-3 py-2">
-                                    {{ mission.statut|upper }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="progress flex-grow-1" style="height: 6px;">
-                                        <div class="progress-bar bg-{{ statusColor[mission.statut]|default('primary') }}" 
-                                             style="width: {{ mission.avancementPourcentage }}%"></div>
-                                    </div>
-                                    <span class="ms-2 small">{{ mission.avancementPourcentage }}%</span>
-                                </div>
-                            </td>
-                            <td class="text-end pe-4">
-                                <a href="{{ path('app_mission_show', {'id': mission.id}) }}" 
-                                   class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="9" class="text-center py-5">
-                                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">Aucune mission trouvée</p>
-                                <a href="#" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle me-2"></i>Créer une mission
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="modal-footer">
+                    <form method="post" id="deleteForm" action="">
+                        <input type="hidden" name="_token" id="csrfToken" value="">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>Supprimer
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Filter Modal -->
-<div class="modal fade" id="filterModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-sliders-h me-2"></i>Filtrer les missions
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Client</label>
-                        <select class="form-select">
-                            <option value="">Tous les clients</option>
-                            {% for client in clients %}
-                            <option value="{{ client.id }}">{{ client.nomClient }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Type de mission</label>
-                        <select class="form-select">
-                            <option value="">Tous les types</option>
-                            {% for type in types %}
-                            <option value="{{ type.id }}">{{ type.libelleTypeMission }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Statut</label>
-                        <select class="form-select">
-                            <option value="">Tous les statuts</option>
-                            <option value="en cours">En cours</option>
-                            <option value="prévue">Prévue</option>
-                            <option value="terminée">Terminée</option>
-                            <option value="en pause">En pause</option>
-                            <option value="annulée">Annulée</option>
-                        </select>
-                    </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="form-label">Date début</label>
-                            <input type="date" class="form-control">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label">Date fin</label>
-                            <input type="date" class="form-control">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-primary">Appliquer les filtres</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+    <script>
+        function setDeleteData(button)
+        {
+            const url = button.getAttribute('data-url');
+            const missionNo = button.getAttribute('data-mission');
+            const token = button.getAttribute('data-token');
+            document.getElementById('missionNo').textContent = missionNo;
+            document.getElementById('deleteForm').action = url;
+            document.getElementById('csrfToken').value = token;
+        }
 
-{% block javascripts %}
-{{ parent() }}
-<script>
-document.getElementById('searchMission')?.addEventListener('keyup', function() {
-    let searchText = this.value.toLowerCase();
-    let tableRows = document.querySelectorAll('tbody tr');
-    
-    tableRows.forEach(row => {
-        let text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchText) ? '' : 'none';
-    });
-});
-</script>
+        document.addEventListener('DOMContentLoaded', function()
+        {
+            const applyFilters = document.getElementById('applyFilters');
+            const resetFilters = document.getElementById('resetFilters');
+            if(applyFilters)
+            {
+                applyFilters.addEventListener('click', function()
+                {
+                    const client = document.getElementById('filterClient').value;
+                    const type = document.getElementById('filterType').value;
+                    const statut = document.getElementById('filterStatut').value;
+                    const dateDebut = document.getElementById('filterDateDebut').value;
+                    const dateFin = document.getElementById('filterDateFin').value;
+                    let url = window.location.pathname + '?';
+                    const params = [];
+                    if (client) params.push('client=' + encodeURIComponent(client));
+                    if (type) params.push('type=' + encodeURIComponent(type));
+                    if (statut) params.push('statut=' + encodeURIComponent(statut));
+                    if (dateDebut) params.push('dateDebut=' + encodeURIComponent(dateDebut));
+                    if (dateFin) params.push('dateFin=' + encodeURIComponent(dateFin));
+                    window.location.href = url + params.join('&');
+                });
+            }
+            
+            if(resetFilters)
+            {
+                resetFilters.addEventListener('click', function()
+                {
+                    window.location.href = window.location.pathname;
+                });
+            }
+        });
+    </script>
 {% endblock %}

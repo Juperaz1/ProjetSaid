@@ -15,7 +15,7 @@ app_home:
     controller: App\Controller\MissionController::index
     methods: GET
 
-app_missions_index:
+app_mission_index:
     path: /missions
     controller: App\Controller\MissionController::index
     methods: GET
@@ -52,3 +52,20 @@ controllers:
     resource: ../src/Controller/
     type: attribute
     prefix: /
+
+app_mission_creer:
+    path: /mission/creer
+    controller: App\Controller\MissionController::creerMission
+    methods: [GET, POST]
+
+app_mission_edit:
+    path: /mission/{id}/edit
+    controller: App\Controller\MissionController::editMission
+    requirements:
+        id: '\d+'
+    methods: [GET, POST]
+
+app_mission_delete:
+    path: /mission/{id}/delete
+    controller: App\Controller\MissionController::deleteMission
+    methods: POST

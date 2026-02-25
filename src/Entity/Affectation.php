@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Entity;
-
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -13,11 +12,11 @@ class Affectation
     #[ORM\Column(name: "IdAffectation", type: "integer")]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Mission::class, inversedBy: 'affectations')]
-    #[ORM\JoinColumn(name: "IdMission", referencedColumnName: "IdMission", nullable: false)]
-    private ?Mission $mission = null;
+    #[ORM\ManyToOne(targetEntity: Tache::class, inversedBy: 'affectations')]
+    #[ORM\JoinColumn(name: "IdTache", referencedColumnName: "IdTache", nullable: false)]
+    private ?Tache $tache = null;
 
-    #[ORM\ManyToOne(targetEntity: Employes::class)]
+    #[ORM\ManyToOne(targetEntity: Employes::class, inversedBy: 'affectations')]
     #[ORM\JoinColumn(name: "IdEmploye", referencedColumnName: "IdEmploye", nullable: false)]
     private ?Employes $employe = null;
 
@@ -35,14 +34,14 @@ class Affectation
         return $this->id;
     }
 
-    public function getMission(): ?Mission
+    public function getTache(): ?Tache
     {
-        return $this->mission;
+        return $this->tache;
     }
 
-    public function setMission(?Mission $mission): self
+    public function setTache(?Tache $tache): self
     {
-        $this->mission = $mission;
+        $this->tache = $tache;
         return $this;
     }
 

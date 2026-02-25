@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : db:3306
--- Généré le : mer. 18 fév. 2026 à 10:15
+-- Généré le : mer. 25 fév. 2026 à 22:15
 -- Version du serveur : 11.8.5-MariaDB-ubu2404
 -- Version de PHP : 8.3.26
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `AFFECTATIONS` (
   `IdAffectation` int(11) NOT NULL,
-  `IdMission` int(11) NOT NULL,
+  `IdTache` int(11) NOT NULL,
   `IdEmploye` int(11) NOT NULL,
   `RoleMission` varchar(100) DEFAULT NULL,
   `DateAffectation` date NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE `AFFECTATIONS` (
 -- Déchargement des données de la table `AFFECTATIONS`
 --
 
-INSERT INTO `AFFECTATIONS` (`IdAffectation`, `IdMission`, `IdEmploye`, `RoleMission`, `DateAffectation`, `DateFinAffectation`) VALUES
+INSERT INTO `AFFECTATIONS` (`IdAffectation`, `IdTache`, `IdEmploye`, `RoleMission`, `DateAffectation`, `DateFinAffectation`) VALUES
 (1, 1, 1, 'Chef de mission', '2025-01-10', NULL),
 (2, 1, 2, 'Auditeur junior', '2025-01-10', NULL),
 (3, 2, 3, 'Responsable fiscal', '2025-01-20', NULL),
@@ -121,7 +121,8 @@ INSERT INTO `EMPLOYES` (`IdEmploye`, `NomEmploye`, `PrenomEmploye`, `EmailEmploy
 (3, 'Bernard', 'Pierre', 'pierre.bernard@email.com', 2, 'actif', 1),
 (4, 'Petit', 'Marie', 'marie.petit@email.com', 2, 'actif', 0),
 (5, 'Durand', 'Thomas', 'thomas.durand@email.com', 3, 'actif', 0),
-(6, 'Leroy', 'Julie', 'julie.leroy@email.com', 3, 'actif', 1);
+(6, 'Leroy', 'Julie', 'julie.leroy@email.com', 3, 'actif', 1),
+(7, 'À compléter', 'À compléter', 'test@mail.com', NULL, 'actif', 0);
 
 -- --------------------------------------------------------
 
@@ -211,7 +212,8 @@ INSERT INTO `MISSIONS` (`IdMission`, `NoMission`, `IdClient`, `IdTypeMission`, `
 (1, 'MISSION-2025-001', 1, 1, '2025-01-15', '2025-03-30', 'Audit annuel des comptes 2024', 15000.00, 120.00, 1, 'en cours', 0.00, '2026-02-18 10:15:10'),
 (2, 'MISSION-2025-002', 2, 2, '2025-02-01', '2025-04-15', 'Préparation déclaration fiscale 2024', 8000.00, 60.00, 3, 'en cours', 0.00, '2026-02-18 10:15:10'),
 (3, 'MISSION-2025-003', 3, 4, '2025-03-01', '2025-05-30', 'Bilan comptable annuel', 12000.00, 100.00, 6, 'prévue', 0.00, '2026-02-18 10:15:10'),
-(4, 'MISSION-2025-004', 1, 3, '2025-02-15', '2025-03-15', 'Conseil en optimisation fiscale', 5000.00, 40.00, 1, 'terminée', 0.00, '2026-02-18 10:15:10');
+(4, 'MISSION-2025-004', 1, 3, '2025-02-15', '2025-03-15', 'Conseil en optimisation fiscale', 5000.00, 40.00, 1, 'terminée', 0.00, '2026-02-18 10:15:10'),
+(8, 'MISSION-2026-001', 1, 1, '2026-02-25', '2026-03-27', 'test tâche', 10.00, 10.00, 6, 'prévue', 0.00, '2026-02-25 16:00:30');
 
 -- --------------------------------------------------------
 
@@ -284,7 +286,8 @@ INSERT INTO `TACHES` (`IdTache`, `IdMission`, `LibelleTache`, `Description`, `Du
 (1, 1, 'Collecte des documents', 'Récupérer tous les justificatifs comptables', 20.00, '2025-01-15', '2025-01-31', 'haute', 'terminée'),
 (2, 1, 'Analyse des comptes', 'Vérification des écritures comptables', 50.00, '2025-02-01', '2025-02-28', 'haute', 'en cours'),
 (3, 1, 'Rédaction du rapport', 'Préparation du rapport d\'audit', 30.00, '2025-03-01', '2025-03-15', 'moyenne', 'à faire'),
-(4, 2, 'Calcul des impôts', 'Préparation de la liasse fiscale', 40.00, '2025-02-01', '2025-03-01', 'haute', 'en cours');
+(4, 2, 'Calcul des impôts', 'Préparation de la liasse fiscale', 40.00, '2025-02-01', '2025-03-01', 'haute', 'en cours'),
+(5, 8, 'test', 'test de nouvelles fonctionnalités', 10.00, '2026-02-25', '2026-03-27', 'critique', 'à faire');
 
 -- --------------------------------------------------------
 
@@ -310,7 +313,8 @@ INSERT INTO `TACHES_COMPETENCES` (`IdTache`, `IdCompetence`, `NiveauRequis`) VAL
 (3, 1, 'expert'),
 (3, 3, 'avancé'),
 (4, 2, 'expert'),
-(4, 7, 'intermédiaire');
+(4, 7, 'intermédiaire'),
+(5, 8, 'expert');
 
 -- --------------------------------------------------------
 
@@ -354,7 +358,8 @@ CREATE TABLE `UTILISATEURS` (
 INSERT INTO `UTILISATEURS` (`IdUtilisateur`, `IdEmploye`, `Login`, `Password`) VALUES
 (1, 1, 'jdupont', 'password_a_hasher'),
 (2, 2, 'smartin', 'password_a_hasher'),
-(3, 3, 'pbernard', 'password_a_hasher');
+(3, 3, 'pbernard', 'password_a_hasher'),
+(4, 7, 'test', '$2y$13$25RaWYFf3PLNi.JwbmWDp.DlzbGcM3yYnu5W1oJcgrDt37rN/EtrO');
 
 --
 -- Index pour les tables déchargées
@@ -365,8 +370,9 @@ INSERT INTO `UTILISATEURS` (`IdUtilisateur`, `IdEmploye`, `Login`, `Password`) V
 --
 ALTER TABLE `AFFECTATIONS`
   ADD PRIMARY KEY (`IdAffectation`),
-  ADD UNIQUE KEY `unique_affectation` (`IdMission`,`IdEmploye`,`DateAffectation`),
-  ADD KEY `IdEmploye` (`IdEmploye`);
+  ADD UNIQUE KEY `unique_affectation` (`IdTache`,`IdEmploye`,`DateAffectation`),
+  ADD KEY `IdEmploye` (`IdEmploye`),
+  ADD KEY `idx_affectations_tache` (`IdTache`);
 
 --
 -- Index pour la table `CLIENTS`
@@ -483,7 +489,7 @@ ALTER TABLE `COMPETENCES`
 -- AUTO_INCREMENT pour la table `EMPLOYES`
 --
 ALTER TABLE `EMPLOYES`
-  MODIFY `IdEmploye` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `IdEmploye` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `FEUILLESTEMPS`
@@ -495,7 +501,7 @@ ALTER TABLE `FEUILLESTEMPS`
 -- AUTO_INCREMENT pour la table `MISSIONS`
 --
 ALTER TABLE `MISSIONS`
-  MODIFY `IdMission` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `IdMission` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT pour la table `PLANNING_GANTT`
@@ -513,7 +519,7 @@ ALTER TABLE `SITES`
 -- AUTO_INCREMENT pour la table `TACHES`
 --
 ALTER TABLE `TACHES`
-  MODIFY `IdTache` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `IdTache` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT pour la table `TYPESMISSIONS`
@@ -525,7 +531,7 @@ ALTER TABLE `TYPESMISSIONS`
 -- AUTO_INCREMENT pour la table `UTILISATEURS`
 --
 ALTER TABLE `UTILISATEURS`
-  MODIFY `IdUtilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `IdUtilisateur` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Contraintes pour les tables déchargées
@@ -535,7 +541,7 @@ ALTER TABLE `UTILISATEURS`
 -- Contraintes pour la table `AFFECTATIONS`
 --
 ALTER TABLE `AFFECTATIONS`
-  ADD CONSTRAINT `AFFECTATIONS_ibfk_1` FOREIGN KEY (`IdMission`) REFERENCES `MISSIONS` (`IdMission`),
+  ADD CONSTRAINT `AFFECTATIONS_ibfk_1` FOREIGN KEY (`IdTache`) REFERENCES `TACHES` (`IdTache`),
   ADD CONSTRAINT `AFFECTATIONS_ibfk_2` FOREIGN KEY (`IdEmploye`) REFERENCES `EMPLOYES` (`IdEmploye`);
 
 --

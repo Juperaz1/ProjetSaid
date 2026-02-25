@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -37,6 +38,18 @@ class Tache
 
     #[ORM\Column(name: "Statut", type: "string", columnDefinition: "enum('à faire','en cours','terminée','bloquée')", options: ["default" => "à faire"])]
     private ?string $statut = 'à faire';
+
+    #[ORM\OneToMany(mappedBy: 'tache', targetEntity: TachesCompetences::class)]
+    private Collection $tachesCompetences;
+
+    #[ORM\OneToMany(mappedBy: 'tache', targetEntity: Affectation::class)]
+    private Collection $affectations;
+
+    public function __construct()
+    {
+        $this->tachesCompetences = new ArrayCollection();
+        $this->affectations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -128,6 +141,60 @@ class Tache
     public function setStatut(string $statut): self
     {
         $this->statut = $statut;
+        return $this;
+    }
+
+    public function getTachesCompetences(): Collection
+    {
+        return $this->tachesCompetences;
+    }
+
+    public function getAffectations(): Collection
+    {
+        return $this->affectations;
+    }
+
+    public function addTachesCompetence(TachesCompetences $tachesCompetence): self
+    {
+        if(!$this->tachesCompetences->contains($tachesCompetence))
+        {
+            $this->tachesCompetences->add($tachesCompetence);
+            $tachesCompetence->setTache($this);
+        }
+        return $this;
+    }
+
+    public function removeTachesCompetence(TachesCompetences $tachesCompetence): self
+    {
+        if($this->tachesCompetences->removeElement($tachesCompetence))
+        {
+            if($tachesCompetence->getTache() === $this)
+            {
+                $tachesCompetence->setTache(null);
+            }
+        }
+        return $this;
+    }
+
+    public function addAffectation(Affectation $affectation): self
+    {
+        if(!$this->affectations->contains($affectation))
+        {
+            $this->affectations->add($affectation);
+            $affectation->setTache($this);
+        }
+        return $this;
+    }
+
+    public function removeAffectation(Affectation $affectation): self
+    {
+        if($this->affectations->removeElement($affectation))
+        {
+            if($affectation->getTache() === $this)
+            {
+                $affectation->setTache(null);
+            }
+        }
         return $this;
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Entity;
-
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -14,13 +15,13 @@ class Employes
     private ?int $id = null;
 
     #[ORM\Column(name: "NomEmploye", type: "string", length: 50)]
-    private ?string $nom = null;
+    private ?string $nomEmploye = null;
 
     #[ORM\Column(name: "PrenomEmploye", type: "string", length: 50)]
-    private ?string $prenom = null;
+    private ?string $prenomEmploye = null;
 
     #[ORM\Column(name: "EmailEmploye", type: "string", length: 100, unique: true)]
-    private ?string $email = null;
+    private ?string $emailEmploye = null;
 
     #[ORM\Column(name: "EstResponsable", type: "boolean", options: ["default" => false])]
     private ?bool $estResponsable = false;
@@ -31,41 +32,53 @@ class Employes
     #[ORM\Column(name: "IdSite", type: "integer", nullable: true)]
     private ?int $idSite = null;
 
+    #[ORM\OneToMany(mappedBy: 'employe', targetEntity: Affectation::class)]
+    private Collection $affectations;
+
+    #[ORM\OneToMany(mappedBy: 'employe', targetEntity: EmployesCompetences::class)]
+    private Collection $employesCompetences;
+
+    public function __construct()
+    {
+        $this->affectations = new ArrayCollection();
+        $this->employesCompetences = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getNomEmploye(): ?string
     {
-        return $this->nom;
+        return $this->nomEmploye;
     }
 
-    public function setNom(string $nom): self
+    public function setNomEmploye(string $nomEmploye): self
     {
-        $this->nom = $nom;
+        $this->nomEmploye = $nomEmploye;
         return $this;
     }
 
-    public function getPrenom(): ?string
+    public function getPrenomEmploye(): ?string
     {
-        return $this->prenom;
+        return $this->prenomEmploye;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenomEmploye(string $prenomEmploye): self
     {
-        $this->prenom = $prenom;
+        $this->prenomEmploye = $prenomEmploye;
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmailEmploye(): ?string
     {
-        return $this->email;
+        return $this->emailEmploye;
     }
 
-    public function setEmail(string $email): self
+    public function setEmailEmploye(string $emailEmploye): self
     {
-        $this->email = $email;
+        $this->emailEmploye = $emailEmploye;
         return $this;
     }
 
@@ -104,6 +117,16 @@ class Employes
 
     public function getFullName(): string
     {
-        return $this->prenom . ' ' . $this->nom;
+        return $this->prenomEmploye . ' ' . $this->nomEmploye;
+    }
+
+    public function getAffectations(): Collection
+    {
+        return $this->affectations;
+    }
+
+    public function getEmployesCompetences(): Collection
+    {
+        return $this->employesCompetences;
     }
 }

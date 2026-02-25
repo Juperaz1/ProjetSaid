@@ -1,0 +1,438 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Mission {{ mission.noMission }}
+{% endblock %}
+{% block body %}
+    <style>
+        .mission-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .breadcrumb-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-custom a {
+            color: var(--gray-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-custom a:hover {
+            color: var(--primary-color);
+        }
+
+        .breadcrumb-custom i {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.en-cours {
+            background: rgba(255, 193, 7, 0.15);
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .status-badge.prevue {
+            background: rgba(13, 202, 240, 0.15);
+            color: #055160;
+            border: 1px solid #0dcaf0;
+        }
+
+        .status-badge.terminee {
+            background: rgba(25, 135, 84, 0.15);
+            color: #0a3622;
+            border: 1px solid #198754;
+        }
+
+        .status-badge.en-pause {
+            background: rgba(108, 117, 125, 0.15);
+            color: #2b2f32;
+            border: 1px solid #6c757d;
+        }
+
+        .status-badge.annulee {
+            background: rgba(220, 53, 69, 0.15);
+            color: #721c24;
+            border: 1px solid #dc3545;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card-header {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05));
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-card-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-card-header h3 i {
+            color: var(--primary-color);
+        }
+
+        .detail-card-body {
+            padding: 1.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .info-value.small {
+            font-size: 1rem;
+        }
+
+        .description-box {
+            background: var(--light-gray);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-top: 1.5rem;
+        }
+
+        .progress-large {
+            height: 12px;
+            background-color: var(--light-gray);
+            border-radius: 30px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar-large {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 30px;
+            transition: width 0.3s ease;
+        }
+
+        .team-member {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .team-member:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+        }
+
+        .member-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: sticky;
+            top: 100px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .action-btn:hover {
+            background: var(--light-gray);
+            border-left-color: var(--primary-color);
+        }
+
+        .action-btn i {
+            width: 24px;
+            color: var(--primary-color);
+            margin-right: 1rem;
+        }
+
+        .action-btn.danger {
+            color: var(--danger-color);
+        }
+
+        .action-btn.danger i {
+            color: var(--danger-color);
+        }
+
+        .action-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-card {
+                position: static;
+                margin-top: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="mission-container">
+            <div class="breadcrumb-custom">
+                <a href="{{ path('app_mission_index') }}">
+                    <i class="fas fa-home me-1"></i>Tableau de Bord
+                </a>
+                <i class="fas fa-chevron-right"></i>
+                <span style="color: var(--dark-color); font-weight: 500;">{{ mission.noMission }}</span>
+            </div>
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h1>
+                        <i class="fas fa-rocket"></i>
+                        {{ mission.noMission }}
+                    </h1>
+                    <span class="status-badge {{ mission.statut|replace({' ': '-'}) }}">
+                        <i class="fas fa-{% if mission.statut == 'en cours' %}spinner{% elseif mission.statut == 'prévue' %}clock{% elseif mission.statut == 'terminée' %}check-circle{% elseif mission.statut == 'en pause' %}pause-circle{% else %}times-circle{% endif %} me-2"></i>
+                        {{ mission.statut|upper }}
+                    </span>
+                </div>
+                <p class="text-muted">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Créée le {{ mission.dateCreation|date('d/m/Y à H:i') }}
+                </p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="detail-card">
+                        <div class="detail-card-header">
+                            <h3>
+                                <i class="fas fa-info-circle"></i>
+                                Informations générales
+                            </h3>
+                        </div>
+                        <div class="detail-card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-building"></i>
+                                        Client
+                                    </div>
+                                    <div class="info-value">{{ mission.client.nomClient }}</div>
+                                    <small class="text-muted">SIRET: {{ mission.client.siretClient }}</small>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-tag"></i>
+                                        Type de mission
+                                    </div>
+                                    <div class="info-value">{{ mission.typeMission.libelleTypeMission }}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-calendar"></i>
+                                        Date de début
+                                    </div>
+                                    <div class="info-value">{{ mission.dateDebut|date('d/m/Y') }}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-calendar-check"></i>
+                                        Date de fin prévue
+                                    </div>
+                                    <div class="info-value">{{ mission.dateFinPrevue|date('d/m/Y') }}</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-euro-sign"></i>
+                                        Budget (€)
+                                    </div>
+                                    <div class="info-value">{{ mission.budgetEuro|number_format(0, ',', ' ') }} €</div>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-clock"></i>
+                                        Budget (heures)
+                                    </div>
+                                    <div class="info-value">{{ mission.budgetHeures }} h</div>
+                                </div>
+                            </div>
+                            
+                            <div class="description-box">
+                                <div class="info-label mb-3">
+                                    <i class="fas fa-align-left"></i>
+                                    Description
+                                </div>
+                                <div class="text-muted" style="line-height: 1.8;">
+                                    {{ mission.description|nl2br }}
+                                </div>
+                            </div>
+                            <div class="taches-section" style="margin-top: 2rem;">
+                                <h3 class="mb-3"><i class="fas fa-tasks me-2 text-primary"></i>Tâches de la mission</h3>
+                                {% if mission.taches|length > 0 %}
+                                    <div class="row">
+                                        {% for tache in mission.taches %}
+                                            <div class="col-md-6 mb-3">
+                                                <div class="card">
+                                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                                        <h5 class="mb-0">{{ tache.libelleTache }}</h5>
+                                                        <span class="badge {% if tache.statut == 'terminée' %}bg-success{% elseif tache.statut == 'en cours' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                                            {{ tache.statut }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="mb-2">
+                                                            <strong>Priorité :</strong> 
+                                                            <span class="badge {% if tache.priorite == 'haute' %}bg-danger{% elseif tache.priorite == 'moyenne' %}bg-info{% else %}bg-secondary{% endif %}">
+                                                                {{ tache.priorite }}
+                                                            </span>
+                                                            <span class="ms-3"><strong>Durée :</strong> {{ tache.dureeEstimee }} h</span>
+                                                        </div>
+                                                        
+                                                        {% if tache.description %}
+                                                            <p><strong>Description :</strong><br>{{ tache.description }}</p>
+                                                        {% endif %}
+                                                        
+                                                        {% if tache.tachesCompetences|length > 0 %}
+                                                            <div class="mt-2">
+                                                                <strong>Compétences requises :</strong>
+                                                                <div class="mt-1">
+                                                                    {% for tc in tache.tachesCompetences %}
+                                                                        <span class="badge bg-info me-1 mb-1">
+                                                                            {{ tc.competence.libelleCompetence }} ({{ tc.niveauRequis }})
+                                                                        </span>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Aucune tâche n'a été définie pour cette mission.
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

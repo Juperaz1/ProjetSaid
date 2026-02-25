@@ -1,0 +1,650 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+    Créer une nouvelle mission
+{% endblock %}
+{% block body %}
+    <style>
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .breadcrumb-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-custom a {
+            color: var(--gray-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-custom a:hover {
+            color: var(--primary-color);
+        }
+
+        .breadcrumb-custom i {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-card-header {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(58, 12, 163, 0.05));
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-card-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .form-card-header h2 i {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .form-card-body {
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section-title i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .form-label .required {
+            color: var(--danger-color);
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: var(--gray-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            outline: none;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group-text {
+            background: var(--light-gray);
+            border: 2px solid var(--border-color);
+            border-left: none;
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        .alert-info-custom {
+            background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 202, 240, 0.05));
+            border: 1px solid rgba(13, 202, 240, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .alert-info-custom i {
+            color: #0dcaf0;
+        }
+
+        .alert-info-custom h5 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .form-text {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-light {
+            background: var(--light-gray);
+            border: 2px solid var(--border-color);
+            color: var(--gray-color);
+        }
+
+        .btn-light:hover {
+            background: white;
+            border-color: var(--gray-color);
+            color: var(--dark-color);
+        }
+
+        @media (max-width: 768px) {
+            .form-card-body {
+                padding: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="form-container">
+            <div class="breadcrumb-custom">
+                <a href="{{ path('app_mission_index') }}">
+                    <i class="fas fa-home me-1"></i>Tableau de Bord
+                </a>
+                <i class="fas fa-chevron-right"></i>
+                <span style="color: var(--dark-color); font-weight: 500;">Nouvelle Mission</span>
+            </div>
+            <div class="page-header">
+                <h1>Création d'une mission</h1>
+                <p class="text-muted">Remplissez les informations ci-dessous pour créer une nouvelle mission</p>
+            </div>
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px; margin-bottom: 1.5rem;">
+                    <i class="fas fa-check-circle me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h2>
+                        <i class="fas fa-plus-circle"></i>
+                        Nouvelle mission
+                    </h2>
+                </div>
+                <div class="form-card-body">
+                    <form method="post" action="{{ path('app_mission_creer') }}" id="formCreationMission">
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-info-circle"></i>
+                                Informations générales
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="client" class="form-label">
+                                            Client <span class="required">*</span>
+                                        </label>
+                                        <select class="form-select" id="client" name="client" required>
+                                            <option value="">Sélectionnez un client</option>
+                                            {% for client in clients %}
+                                                <option value="{{ client.id }}">{{ client.nomClient }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div> 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="type_mission" class="form-label">
+                                            Type de mission <span class="required">*</span>
+                                        </label>
+                                        <select class="form-select" id="type_mission" name="type_mission" required>
+                                            <option value="">Sélectionnez un type</option>
+                                            {% for type in types_mission %}
+                                                <option value="{{ type.id }}">{{ type.libelleTypeMission }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="date_debut" class="form-label">
+                                            Date de début <span class="required">*</span>
+                                        </label>
+                                        <input type="date" class="form-control" id="date_debut" name="date_debut" 
+                                            value="{{ 'now'|date('Y-m-d') }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="date_fin" class="form-label">
+                                            Date de fin prévue <span class="required">*</span>
+                                        </label>
+                                        <input type="date" class="form-control" id="date_fin" name="date_fin" 
+                                            value="{{ '+30 days'|date('Y-m-d') }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="description" class="form-label">Description détaillée</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" 
+                                        placeholder="Décrivez la mission, ses objectifs, les livrables attendus..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-euro-sign"></i>
+                                Budget
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="budget_euro" class="form-label">Budget (€)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="budget_euro" name="budget_euro" 
+                                                step="0.01" min="0" placeholder="0.00">
+                                            <span class="input-group-text">€</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="budget_heures" class="form-label">Budget (heures)</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" id="budget_heures" name="budget_heures" 
+                                                step="0.5" min="0" placeholder="0.00">
+                                            <span class="input-group-text">h</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-user-tie"></i>
+                                Responsable
+                            </div>
+                            <div class="form-group">
+                                <label for="responsable" class="form-label">Responsable de mission</label>
+                                <select class="form-select" id="responsable" name="responsable">
+                                    <option value="">Sélectionnez un responsable (optionnel)</option>
+                                    {% for responsable in responsables %}
+                                        <option value="{{ responsable.id }}">
+                                            {{ responsable.prenomEmploye }} {{ responsable.nomEmploye }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Laissez vide pour une attribution automatique (sera implémenté plus tard)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fas fa-tasks"></i>
+                                Tâches de la mission
+                            </div>
+                            <div id="taches-container">
+                                <div class="tache-item card mb-3 p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0"><i class="fas fa-check-circle me-2 text-primary"></i>Tâche 1</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="supprimerTache(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label">Libellé de la tâche *</label>
+                                            <input type="text" name="tache_libelle[]" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label class="form-label">Durée estimée (h)</label>
+                                            <input type="number" name="tache_duree[]" class="form-control" step="0.5" min="0">
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <label class="form-label">Priorité</label>
+                                            <select name="tache_priorite[]" class="form-select">
+                                                {% for priorite in priorites %}
+                                                    <option value="{{ priorite }}" {% if priorite == 'moyenne' %}selected{% endif %}>{{ priorite|capitalize }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="form-label">Description</label>
+                                        <textarea name="tache_description[]" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="competences-container">
+                                        <label class="form-label">Compétences requises</label>
+                                        <div class="competence-items">
+                                            <div class="row competence-item mb-2">
+                                                <div class="col-md-6">
+                                                    <select name="tache_competences[0][]" class="form-select">
+                                                        <option value="">Sélectionnez une compétence</option>
+                                                        {% for competence in competences %}
+                                                            <option value="{{ competence.id }}">{{ competence.libelleCompetence }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <select name="tache_niveau[0][]" class="form-select">
+                                                        {% for niveau in niveaux %}
+                                                            <option value="{{ niveau }}">{{ niveau|capitalize }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="ajouterCompetence(this)">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-primary" onclick="ajouterTache()">
+                                    <i class="fas fa-plus-circle me-2"></i>Ajouter une tâche
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <a href="{{ path('app_mission_index') }}" class="btn btn-light">
+                                <i class="fas fa-times"></i>
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Créer la mission
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+            let tacheCount = 1;
+            let competenceCounters = [1];
+            const priorites = {{ priorites|json_encode|raw }};
+            const competences = [{% for competence in competences %}{ id: {{ competence.id }}, libelleCompetence: "{{ competence.libelleCompetence|e('js') }}" },{% endfor %}];
+            const niveaux = {{ niveaux|json_encode|raw }};
+            function ajouterTache()
+            {
+                tacheCount++;
+                competenceCounters[tacheCount - 1] = 1;
+                const container = document.getElementById('taches-container');
+                const newTache = document.createElement('div');
+                newTache.className = 'tache-item card mb-3 p-3';
+                let prioriteOptions = '';
+                priorites.forEach(priorite => {
+                    const selected = priorite === 'moyenne' ? 'selected' : '';
+                    prioriteOptions += `<option value="${priorite}" ${selected}>${priorite.charAt(0).toUpperCase() + priorite.slice(1)}</option>`;
+                });
+                let competenceOptions = '<option value="">Sélectionnez une compétence</option>';
+                competences.forEach(competence => {
+                    competenceOptions += `<option value="${competence.id}">${competence.libelleCompetence}</option>`;
+                });
+                let niveauOptions = '';
+                niveaux.forEach(niveau => {
+                    niveauOptions += `<option value="${niveau}">${niveau.charAt(0).toUpperCase() + niveau.slice(1)}</option>`;
+                });
+                newTache.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="fas fa-check-circle me-2 text-primary"></i>Tâche ${tacheCount}</h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="supprimerTache(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label">Libellé de la tâche *</label>
+                            <input type="text" name="tache_libelle[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label">Durée estimée (h)</label>
+                            <input type="number" name="tache_duree[]" class="form-control" step="0.5" min="0">
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label">Priorité</label>
+                            <select name="tache_priorite[]" class="form-select">
+                                ${prioriteOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Description</label>
+                        <textarea name="tache_description[]" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="competences-container">
+                        <label class="form-label">Compétences requises</label>
+                        <div class="competence-items">
+                            <div class="row competence-item mb-2">
+                                <div class="col-md-6">
+                                    <select name="tache_competences[${tacheCount-1}][]" class="form-select">
+                                        ${competenceOptions}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="tache_niveau[${tacheCount-1}][]" class="form-select">
+                                        ${niveauOptions}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="ajouterCompetence(this, ${tacheCount-1})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(newTache);
+            }
+
+            function supprimerTache(button)
+            {
+                const tacheItem = button.closest('.tache-item');
+                if(document.querySelectorAll('.tache-item').length > 1)
+                {
+                    tacheItem.remove();
+                }
+                else
+                {
+                    alert('Vous devez garder au moins une tâche.');
+                }
+            }
+
+            function ajouterCompetence(button, tacheIndex)
+            {
+                const competenceItems = button.closest('.competence-items');
+                const newCompetence = document.createElement('div');
+                newCompetence.className = 'row competence-item mb-2';
+                const counter = competenceCounters[tacheIndex] || 1;
+                competenceCounters[tacheIndex] = counter + 1;
+                let competenceOptions = '<option value="">Sélectionnez une compétence</option>';
+                competences.forEach(competence => {
+                    competenceOptions += `<option value="${competence.id}">${competence.libelleCompetence}</option>`;
+                });
+                let niveauOptions = '';
+                niveaux.forEach(niveau => {
+                    niveauOptions += `<option value="${niveau}">${niveau.charAt(0).toUpperCase() + niveau.slice(1)}</option>`;
+                });
+                newCompetence.innerHTML = `
+                    <div class="col-md-6">
+                        <select name="tache_competences[${tacheIndex}][]" class="form-select">
+                            ${competenceOptions}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="tache_niveau[${tacheIndex}][]" class="form-select">
+                            ${niveauOptions}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="supprimerCompetence(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                competenceItems.appendChild(newCompetence);
+            }
+
+            function supprimerCompetence(button)
+            {
+                const competenceItem = button.closest('.competence-item');
+                if(competenceItem.parentElement.children.length > 1)
+                {
+                    competenceItem.remove();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function()
+            {
+                const form = document.getElementById('formCreationMission');
+                const dateDebut = document.getElementById('date_debut');
+                const dateFin = document.getElementById('date_fin');
+                form.addEventListener('submit', function(e)
+                {
+                    if(new Date(dateDebut.value) > new Date(dateFin.value))
+                    {
+                        e.preventDefault();
+                        alert('La date de fin doit être postérieure à la date de début.');
+                        return;
+                    }
+                    const taches = document.querySelectorAll('.tache-item');
+                    let hasError = false;
+                    taches.forEach((tache, index) =>
+                    {
+                        const libelle = tache.querySelector('input[name="tache_libelle[]"]');
+                        if(!libelle.value.trim())
+                        {
+                            e.preventDefault();
+                            alert(`La tâche ${index + 1} doit avoir un libellé.`);
+                            hasError = true;
+                            return;
+                        }
+                    });
+                    if (hasError) return;
+                });
+                dateDebut.addEventListener('change', function() {
+                    dateFin.min = this.value;
+                    if(dateFin.value && new Date(dateFin.value) < new Date(this.value))
+                    {
+                        dateFin.value = this.value;
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

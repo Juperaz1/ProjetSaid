@@ -7,6 +7,7 @@
     
     {% block stylesheets %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* ===== VARIABLES ===== */
         :root {
@@ -377,7 +378,7 @@
                         <li class="nav-item">
                             <span class="nav-link">
                                 <i class="fas fa-user-circle me-1"></i>
-                                {{ app.user.employe.prenom }} {{ app.user.employe.nom }}
+                                {{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}
                             </span>
                         </li>
                         <li class="nav-item">
