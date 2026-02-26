@@ -59,7 +59,7 @@ class RegistrationController extends AbstractController
             }
 
             $existingEmploye = $entityManager->getRepository(Employes::class)
-                ->findOneBy(['email' => $email]);
+                ->findOneBy(['emailEmploye' => $email]);
             
             if ($existingEmploye) {
                 $this->addFlash('error', 'Cet email est déjà utilisé par un employé existant.');
@@ -75,9 +75,9 @@ class RegistrationController extends AbstractController
             }
 
             $employe = new Employes();
-            $employe->setNom('À compléter');
-            $employe->setPrenom('À compléter');
-            $employe->setEmail($email);
+            $employe->setNomEmploye('À compléter');
+            $employe->setPrenomEmploye('À compléter');
+            $employe->setEmailEmploye($email);
             $employe->setStatut('actif');
             $employe->setEstResponsable(false);
 

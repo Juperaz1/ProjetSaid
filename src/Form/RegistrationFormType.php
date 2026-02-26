@@ -17,16 +17,18 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('login', TextType::class, [
                 'label' => 'Nom d\'utilisateur',
-                'attr' => ['placeholder' => 'Choisissez un nom d\'utilisateur']
+                'required' => true,
             ])
             ->add('agreeTerms', CheckboxType::class, [
+                'mapped' => false,
                 'label' => 'J\'accepte les conditions d\'utilisation',
-                'mapped' => true,
+                'required' => true,
             ])
             ->add('plainPassword', PasswordType::class, [
-                'label' => 'Mot de passe',
                 'mapped' => false,
-                'attr' => ['autocomplete' => 'new-password', 'placeholder' => 'Minimum 6 caractères']
+                'label' => 'Mot de passe',
+                'required' => true,
+                'attr' => ['autocomplete' => 'new-password'],
             ])
         ;
     }

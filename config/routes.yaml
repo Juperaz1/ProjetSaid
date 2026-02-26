@@ -1,20 +1,4 @@
-# yaml-language-server: $schema=../vendor/symfony/routing/Loader/schema/routing.schema.json
-
-# This file is the entry point to configure the routes of your app.
-# Methods with the #[Route] attribute are automatically imported.
-# See also https://symfony.com/doc/current/routing.html
-
-# To list all registered routes, run the following command:
-#   bin/console debug:router
-
 # config/routes.yaml
-
-# Routes principales
-app_home:
-    path: /
-    controller: App\Controller\MissionController::index
-    methods: GET
-
 app_mission_index:
     path: /missions
     controller: App\Controller\MissionController::index
@@ -32,27 +16,6 @@ app_missions_filter:
     controller: App\Controller\MissionController::filter
     methods: GET
 
-# Routes d'authentification (de votre LoginController)
-app_login:
-    path: /connexion
-    controller: App\Controller\LoginController::login
-    methods: [GET, POST]
-
-app_logout:
-    path: /deconnexion
-    controller: App\Controller\LoginController::logout
-    methods: GET
-
-app_register:
-    path: /inscription
-    controller: App\Controller\RegistrationController::register
-    methods: [GET, POST]
-
-controllers:
-    resource: ../src/Controller/
-    type: attribute
-    prefix: /
-
 app_mission_creer:
     path: /mission/creer
     controller: App\Controller\MissionController::creerMission
@@ -69,3 +32,25 @@ app_mission_delete:
     path: /mission/{id}/delete
     controller: App\Controller\MissionController::deleteMission
     methods: POST
+
+# Routes d'authentification
+app_login:
+    path: /connexion
+    controller: App\Controller\LoginController::login
+    methods: [GET, POST]
+
+app_logout:
+    path: /deconnexion
+    controller: App\Controller\LoginController::logout
+    methods: GET
+
+app_register:
+    path: /inscription
+    controller: App\Controller\RegistrationController::register
+    methods: [GET, POST]
+
+# Import automatique des autres routes avec attributs
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+    prefix: /

@@ -5,7 +5,6 @@
 {% block stylesheets %}
 {{ parent() }}
 <style>
-    /* ===== PAGE D'INSCRIPTION ===== */
     .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -55,7 +54,6 @@
         }
     }
 
-    /* ===== EN-TÊTE ===== */
     .text-center {
         text-align: center;
     }
@@ -86,7 +84,6 @@
         color: var(--gray-color);
     }
 
-    /* ===== CARTE ===== */
     .card {
         background: white;
         border-radius: 24px;
@@ -130,7 +127,6 @@
         font-size: 2rem;
     }
 
-    /* ===== ALERTES ===== */
     .alert {
         padding: 1rem 1.5rem;
         border-radius: 14px;
@@ -185,7 +181,6 @@
         opacity: 1;
     }
 
-    /* ===== FORMULAIRE ===== */
     .mb-3, .mb-4 {
         margin-bottom: 1.5rem;
     }
@@ -245,7 +240,6 @@
         color: var(--gray-color);
     }
 
-    /* ===== CHECKBOX ===== */
     .form-check {
         display: flex;
         align-items: center;
@@ -274,7 +268,6 @@
         font-size: 0.95rem;
     }
 
-    /* ===== BOUTON ===== */
     .d-grid {
         display: grid;
     }
@@ -333,7 +326,6 @@
         font-size: 1.1rem;
     }
 
-    /* ===== ERREURS DE FORMULAIRE ===== */
     .form-error {
         color: var(--danger-color);
         font-size: 0.85rem;
@@ -345,7 +337,6 @@
         font-weight: 500;
     }
 
-    /* ===== LIEN DE CONNEXION ===== */
     .mt-4 {
         margin-top: 2rem;
     }
@@ -366,11 +357,6 @@
         margin-left: 0.25rem;
     }
 
-    .text-primary {
-        color: var(--primary-color);
-    }
-
-    /* ===== STATISTIQUES ===== */
     .row.mt-4 {
         margin-top: 2.5rem;
     }
@@ -441,60 +427,6 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-weight: 500;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .display-5 {
-            font-size: 2rem;
-        }
-
-        .lead {
-            font-size: 1rem;
-        }
-
-        .col-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .stat-card {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            padding: 1rem;
-        }
-
-        .stat-card .stat-icon {
-            margin: 0 1rem 0 0;
-            width: 50px;
-            height: 50px;
-            font-size: 1.25rem;
-        }
-
-        .stat-card .stat-number {
-            font-size: 1.5rem;
-            margin-bottom: 0;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .card-body {
-            padding: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-        }
-
-        .btn-lg {
-            font-size: 1rem;
-        }
     }
 </style>
 {% endblock %}

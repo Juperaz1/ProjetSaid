@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,8 +30,9 @@ class Employes
     #[ORM\Column(name: "Statut", type: "string", columnDefinition: "enum('actif','inactif','congé')", options: ["default" => "actif"])]
     private ?string $statut = 'actif';
 
-    #[ORM\Column(name: "IdSite", type: "integer", nullable: true)]
-    private ?int $idSite = null;
+    #[ORM\ManyToOne(targetEntity: Sites::class, inversedBy: 'employes')]
+    #[ORM\JoinColumn(name: "IdSite", referencedColumnName: "IdSite")]
+    private ?Sites $site = null;
 
     #[ORM\OneToMany(mappedBy: 'employe', targetEntity: Affectation::class)]
     private Collection $affectations;
@@ -104,14 +106,14 @@ class Employes
         return $this;
     }
 
-    public function getIdSite(): ?int
+    public function getSite(): ?Sites
     {
-        return $this->idSite;
+        return $this->site;
     }
 
-    public function setIdSite(?int $idSite): self
+    public function setSite(?Sites $site): self
     {
-        $this->idSite = $idSite;
+        $this->site = $site;
         return $this;
     }
 

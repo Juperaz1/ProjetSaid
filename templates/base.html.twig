@@ -9,26 +9,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* ===== VARIABLES ===== */
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3a0ca3;
             --accent-color: #4cc9f0;
-            --success-color: #06d6a0;
             --danger-color: #ef476f;
-            --warning-color: #ffd166;
             --dark-color: #2b2d42;
             --light-gray: #f8f9fa;
             --gray-color: #6c757d;
             --border-color: #e9ecef;
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
             --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.03);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
-            --transition: all 0.2s ease;
         }
 
-        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -51,10 +44,40 @@
             padding: 0 24px;
         }
 
-        /* ===== NAVBAR ===== */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem 0;
+            color: white;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-brand i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
         .navbar {
             background: white;
-            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
             padding: 1rem 0;
             position: sticky;
             top: 0;
@@ -110,7 +133,6 @@
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 8px;
-            transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -122,19 +144,15 @@
             color: var(--primary-color);
         }
 
-        .nav-link.text-danger {
-            color: var(--danger-color);
+        .auth-buttons {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
         }
 
-        .nav-link.text-danger:hover {
-            background: rgba(239, 71, 111, 0.05);
-        }
-
-        /* ===== BOUTONS MAGNIFIQUES ===== */
         .btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1.5rem;
             border: none;
-            border-radius: 10px;
             font-size: 0.95rem;
             font-weight: 600;
             text-decoration: none;
@@ -143,86 +161,139 @@
             justify-content: center;
             gap: 0.5rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
             letter-spacing: 0.3px;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(67, 97, 238, 0.3);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
-        }
-
-        .btn-outline {
+        .btn-login {
             background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-color);
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(67, 97, 238, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Animation de pulsation pour les boutons importants */
-        .btn-pulse {
-            animation: pulse 2s infinite;
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
         }
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
-            }
+        .btn-login:active,
+        .btn-login:focus {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            outline: none;
         }
 
-        /* ===== MAIN CONTENT ===== */
+        .btn-register {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid white;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-register:hover {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid white;
+        }
+
+        .btn-register:active,
+        .btn-register:focus {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid white;
+            outline: none;
+        }
+
+        .btn-logout {
+            background: rgba(239, 71, 111, 0.9);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 71, 111, 0.9);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-logout:active,
+        .btn-logout:focus {
+            background: rgba(239, 71, 111, 0.9);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        /* Style pour le bouton du formulaire de connexion - NE CHANGE PAS au survol */
+        .btn-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+            transition: none !important;
+        }
+        
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary:active:focus,
+        .btn-primary:active:hover {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-badge i {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            color: white;
+        }
+
         main {
             flex: 1;
-            padding: 2rem 0;
+            padding: 3rem 0;
             background: white;
         }
 
-        /* ===== FOOTER ===== */
         footer {
-            background: white;
+            background: var(--light-gray);
             border-top: 1px solid var(--border-color);
             padding: 3rem 0 1.5rem;
             margin-top: auto;
@@ -267,7 +338,6 @@
         footer a {
             color: var(--gray-color);
             text-decoration: none;
-            transition: var(--transition);
             font-size: 0.95rem;
         }
 
@@ -282,7 +352,6 @@
             border-top: 1px solid var(--border-color);
         }
 
-        /* ===== UTILITIES ===== */
         .ms-auto {
             margin-left: auto;
         }
@@ -311,7 +380,6 @@
             color: var(--gray-color);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar-toggler {
                 display: block;
@@ -354,6 +422,27 @@
                 margin-left: 0;
             }
 
+            .auth-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .user-section {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .user-badge {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header .container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
             footer .col-md-6,
             footer .col-md-3 {
                 flex: 0 0 100%;
@@ -364,10 +453,50 @@
     {% endblock %}
 </head>
 <body>
+    <div class="header">
+        <div class="container">
+            <div class="header-brand">
+                <i class="fas fa-chart-pie"></i>
+                <div>
+                    <h2>Tableau de Bord</h2>
+                    <p class="header-title">Gestion de missions et de temps</p>
+                </div>
+            </div>
+            <div>
+                {% if app.user %}
+                    <div class="user-section">
+                        <div class="user-badge">
+                            <i class="fas fa-user-circle"></i>
+                            <div class="user-info">
+                                <span class="user-name">{{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}</span>
+                                <span class="user-role">Administrateur</span>
+                            </div>
+                        </div>
+                        <a class="btn btn-logout" href="{{ path('app_logout') }}">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="auth-buttons">
+                        <a class="btn btn-login" href="{{ path('app_login') }}">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Connexion
+                        </a>
+                        <a class="btn btn-register" href="{{ path('app_register') }}">
+                            <i class="fas fa-user-plus"></i>
+                            Inscription
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar">
         <div class="container">
             <a class="navbar-brand" href="{{ path('app_home') }}">
-                <i class="fas fa-chart-line me-2"></i>Tableau de Bord
+                <i class="fas fa-chart-line me-2"></i>Accueil
             </a>
             <button class="navbar-toggler" type="button" onclick="toggleMenu()">
                 <i class="fas fa-bars"></i>
@@ -376,25 +505,18 @@
                 <ul class="navbar-nav ms-auto">
                     {% if app.user %}
                         <li class="nav-item">
-                            <span class="nav-link">
-                                <i class="fas fa-user-circle me-1"></i>
-                                {{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}
-                            </span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{{ path('app_logout') }}">
-                                <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i>Connexion
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-primary ms-2 btn-pulse" href="{{ path('app_register') }}">
-                                <i class="fas fa-user-plus me-1"></i>Inscription
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-tasks me-1"></i>Missions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-users me-1"></i>Équipe
                             </a>
                         </li>
                     {% endif %}
