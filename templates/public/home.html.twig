@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bienvenue - Application de Gestion{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row min-vh-75 align-items-center">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="display-3 fw-bold mb-4" style="color: var(--primary-color);">
+                Gérez vos missions et votre temps efficacement
+            </h1>
+            <p class="lead mb-4 text-muted">
+                Une solution complète pour suivre vos missions, gérer vos feuilles de temps 
+                et optimiser la productivité de votre équipe.
+            </p>
+          
+            <div class="row mt-5 pt-4">
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="display-4 fw-bold text-primary">100+</div>
+                        <div class="text-muted">Missions réalisées</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="display-4 fw-bold text-primary">50+</div>
+                        <div class="text-muted">Clients satisfaits</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="text-center">
+                        <div class="display-4 fw-bold text-primary">24/7</div>
+                        <div class="text-muted">Support disponible</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4">Pourquoi choisir notre solution ?</h3>
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5>Gestion simplifiée des missions</h5>
+                            <p class="text-muted">Créez, assignez et suivez vos missions en temps réel</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5>Feuilles de temps intuitives</h5>
+                            <p class="text-muted">Saisissez facilement vos heures et générez des rapports</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-users text-primary fa-2x"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5>Collaboration d'équipe</h5>
+                            <p class="text-muted">Travaillez ensemble et suivez la progression de chacun</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

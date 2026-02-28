@@ -33,7 +33,6 @@ app_mission_delete:
     controller: App\Controller\MissionController::deleteMission
     methods: POST
 
-# Routes d'authentification
 app_login:
     path: /connexion
     controller: App\Controller\LoginController::login
@@ -49,7 +48,11 @@ app_register:
     controller: App\Controller\RegistrationController::register
     methods: [GET, POST]
 
-# Import automatique des autres routes avec attributs
+app_home:
+    path: /
+    controller: App\Controller\HomeController::index
+    methods: GET
+
 controllers:
     resource: ../src/Controller/
     type: attribute

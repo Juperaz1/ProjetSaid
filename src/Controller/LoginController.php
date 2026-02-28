@@ -1,4 +1,5 @@
 <?php
+// src/Controller/LoginController.php
 
 namespace App\Controller;
 
@@ -9,7 +10,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class LoginController extends AbstractController
 {
-    #[Route('/connexion', name: 'app_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
@@ -25,7 +25,6 @@ class LoginController extends AbstractController
         ]);
     }
 
-    #[Route('/deconnexion', name: 'app_logout')]
     public function logout(): void
     {
     }

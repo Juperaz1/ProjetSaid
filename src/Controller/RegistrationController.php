@@ -1,4 +1,5 @@
 <?php
+// src/Controller/RegistrationController.php
 
 namespace App\Controller;
 
@@ -14,12 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/inscription', name: 'app_register')]
     public function register(
         Request $request, 
         UserPasswordHasherInterface $userPasswordHasher, 
         EntityManagerInterface $entityManager
     ): Response {
+        // Si l'utilisateur est déjà connecté, rediriger vers l'accueil
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
         }

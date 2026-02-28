@@ -32,10 +32,23 @@ security:
             logout:
                 path: app_logout
                 target: app_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 7 jours en secondes
+                path: /
+                always_remember_me: true
 
     access_control:
-        - { path: ^/connexion, roles: PUBLIC_ACCESS }
-        - { path: ^/inscription, roles: PUBLIC_ACCESS }
+        # Routes publiques (accessibles sans connexion)
+        - { path: ^/connexion$, roles: PUBLIC_ACCESS }
+        - { path: ^/inscription$, roles: PUBLIC_ACCESS }
+        - { path: ^/$ , roles: PUBLIC_ACCESS }
+
+        # Routes protégées (nécessitent une connexion)
+        - { path: ^/missions, roles: ROLE_USER }
+        - { path: ^/mission, roles: ROLE_USER }
+
+        # Par défaut, toutes les autres routes nécessitent une connexion
         - { path: ^/, roles: ROLE_USER }
 
 when@test:
