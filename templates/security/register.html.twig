@@ -1,3 +1,5 @@
+{# templates/security/register.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Inscription - Tableau de Bord{% endblock %}
@@ -400,8 +402,27 @@
                                     }
                                 }) }}
                             </div>
-                            {{ form_errors(registrationForm.login, {'attr': {'class': 'form-error'}}) }}
-                            <div class="form-text">Votre nom d'utilisateur unique</div>
+                            <div class="form-error">
+                                {{ form_errors(registrationForm.login) }}
+                            </div>
+                            <div class="form-text">Votre nom d'utilisateur unique (minimum 3 caractères)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(registrationForm.email, 'Email professionnel', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                {{ form_widget(registrationForm.email, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'votre.email@societe.com'
+                                    }
+                                }) }}
+                            </div>
+                            <div class="form-error">
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                            <div class="form-text">Utilisez votre email professionnel pour vous inscrire</div>
                         </div>
                         
                         <div class="mb-3">
@@ -415,7 +436,9 @@
                                     }
                                 }) }}
                             </div>
-                            {{ form_errors(registrationForm.plainPassword, {'attr': {'class': 'form-error'}}) }}
+                            <div class="form-error">
+                                {{ form_errors(registrationForm.plainPassword) }}
+                            </div>
                             <div class="form-text">Le mot de passe doit contenir au moins 6 caractères</div>
                         </div>
                         
@@ -428,7 +451,9 @@
                                     'label_attr': {'class': 'form-check-label'}
                                 }) }}
                             </div>
-                            {{ form_errors(registrationForm.agreeTerms, {'attr': {'class': 'form-error'}}) }}
+                            <div class="form-error">
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
                         </div>
                         
                         <div class="d-grid gap-2">

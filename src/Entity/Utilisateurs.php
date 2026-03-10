@@ -1,4 +1,5 @@
 <?php
+// src/Entity/Utilisateurs.php
 
 namespace App\Entity;
 
@@ -25,6 +26,10 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(targetEntity: Employes::class)]
     #[ORM\JoinColumn(name: "IdEmploye", referencedColumnName: "IdEmploye", nullable: true)]
     private ?Employes $employe = null;
+
+    // Ajout du champ roles
+    #[ORM\Column(name: "Roles", type: "json", nullable: true)]
+    private array $roles = [];
 
     private ?string $plainPassword = null;
 
@@ -79,15 +84,25 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @see UserInterface
+     */
     public function getRoles(): array
     {
-        $roles = ['ROLE_USER'];
-        
-        if ($this->employe && $this->employe->isEstResponsable()) {
-            $roles[] = 'ROLE_RESPONSABLE';
-        }
-        
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
         return array_unique($roles);
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+        return $this;
     }
 
     public function eraseCredentials(): void

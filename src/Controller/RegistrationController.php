@@ -30,12 +30,18 @@ class RegistrationController extends AbstractController
         if ($form->isSubmitted()) {
             $errors = [];
             
-            // Validation manuelle
             $login = $form->get('login')->getData();
             if (empty($login)) {
                 $errors[] = 'Le nom d\'utilisateur est obligatoire';
             } elseif (strlen($login) < 3) {
                 $errors[] = 'Le nom d\'utilisateur doit contenir au moins 3 caractères';
+            }
+            
+            $email = $form->get('email')->getData();
+            if (empty($email)) {
+                $errors[] = 'L\'email est obligatoire';
+            } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = 'L\'email n\'est pas valide';
             }
             
             $password = $form->get('plainPassword')->getData();
@@ -50,18 +56,19 @@ class RegistrationController extends AbstractController
                 $errors[] = 'Vous devez accepter les conditions d\'utilisation';
             }
             
-            // Vérifier si le login existe déjà
-            $existingUser = $entityManager->getRepository(Utilisateurs::class)->findOneBy(['login' => $login]);
-            if ($existingUser) {
-                $errors[] = 'Ce nom d\'utilisateur est déjà pris';
+            if (!empty($login)) {
+                $existingUser = $entityManager->getRepository(Utilisateurs::class)->findOneBy(['login' => $login]);
+                if ($existingUser) {
+                    $errors[] = 'Ce nom d\'utilisateur est déjà pris';
+                }
             }
             
-            // Essayer de lier à un employé existant (par exemple avec le même login)
-            $employe = $employesRepository->findOneBy(['login' => $login]); // Si vous avez un champ login dans Employes
-            // Ou si vous voulez chercher par email, vous devrez ajouter un champ email dans le formulaire
+            $employe = null;
+            if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $employe = $employesRepository->findOneByEmail($email);
+            }
             
             if (empty($errors)) {
-                // Encoder le mot de passe
                 $user->setPassword(
                     $userPasswordHasher->hashPassword(
                         $user,
@@ -69,7 +76,6 @@ class RegistrationController extends AbstractController
                     )
                 );
                 
-                // Lier à l'employé si trouvé
                 if ($employe) {
                     $user->setEmploye($employe);
                 }

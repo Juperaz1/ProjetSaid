@@ -24,8 +24,8 @@ security:
                 check_path: app_login
                 default_target_path: app_home
                 always_use_default_target_path: true
-                username_parameter: _username
-                password_parameter: _password
+                username_parameter: login
+                password_parameter: password
                 csrf_parameter: _csrf_token
                 csrf_token_id: authenticate
                 enable_csrf: true
@@ -34,7 +34,7 @@ security:
                 target: app_login
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800 # 7 jours en secondes
+                lifetime: 604800
                 path: /
                 always_remember_me: true
 
@@ -44,9 +44,11 @@ security:
         - { path: ^/inscription$, roles: PUBLIC_ACCESS }
         - { path: ^/$ , roles: PUBLIC_ACCESS }
 
+
         # Routes protégées (nécessitent une connexion)
         - { path: ^/missions, roles: ROLE_USER }
         - { path: ^/mission, roles: ROLE_USER }
+        - { path: ^/dashboard, roles: ROLE_USER }
 
         # Par défaut, toutes les autres routes nécessitent une connexion
         - { path: ^/, roles: ROLE_USER }
