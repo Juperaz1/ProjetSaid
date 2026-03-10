@@ -385,7 +385,7 @@
                                     <div class="row">
                                         {% for tache in mission.taches %}
                                             <div class="col-md-6 mb-3">
-                                                <div class="card">
+                                                <div class="card h-100">
                                                     <div class="card-header d-flex justify-content-between align-items-center">
                                                         <h5 class="mb-0">{{ tache.libelleTache }}</h5>
                                                         <span class="badge {% if tache.statut == 'terminée' %}bg-success{% elseif tache.statut == 'en cours' %}bg-warning{% else %}bg-secondary{% endif %}">
@@ -402,21 +402,76 @@
                                                         </div>
                                                         
                                                         {% if tache.description %}
-                                                            <p><strong>Description :</strong><br>{{ tache.description }}</p>
+                                                            <p class="small text-muted">{{ tache.description }}</p>
                                                         {% endif %}
-                                                        
+
                                                         {% if tache.tachesCompetences|length > 0 %}
-                                                            <div class="mt-2">
-                                                                <strong>Compétences requises :</strong>
-                                                                <div class="mt-1">
-                                                                    {% for tc in tache.tachesCompetences %}
-                                                                        <span class="badge bg-info me-1 mb-1">
-                                                                            {{ tc.competence.libelleCompetence }} ({{ tc.niveauRequis }})
-                                                                        </span>
-                                                                    {% endfor %}
-                                                                </div>
+                                                            <div class="mt-2 mb-2">
+                                                                <small class="text-muted d-block mb-1"><strong>Compétences requises :</strong></small>
+                                                                {% for tc in tache.tachesCompetences %}
+                                                                    <span class="badge border text-dark bg-light me-1" title="Niveau requis : {{ tc.niveauRequis }}">
+                                                                        <i class="fas fa-certificate me-1 text-warning"></i>
+                                                                        {{ tc.competence.libelleCompetence }} ({{ tc.niveauRequis }})
+                                                                    </span>
+                                                                {% endfor %}
                                                             </div>
                                                         {% endif %}
+                                                        
+                                                        <div class="assignments-section mt-3">
+                                                            <h6><i class="fas fa-users me-1"></i> Collaborateurs assignés</h6>
+                                                            <ul class="list-unstyled">
+                                                                {% for affectation in tache.affectations %}
+                                                                    <li class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                                                        <span>
+                                                                            <i class="fas fa-user-circle me-1 text-primary"></i>
+                                                                            {{ affectation.employe.getFullName() }}
+                                                                        </span>
+                                                                        <span class="badge bg-light text-dark">{{ affectation.roleMission }}</span>
+                                                                    </li>
+                                                                {% else %}
+                                                                    <li class="text-muted small">Aucun collaborateur assigné</li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                            
+                                                            <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#assignModal{{ tache.id }}">
+                                                                <i class="fas fa-plus me-1"></i> Assigner
+                                                            </button>
+                                                        </div>
+
+                                                        <!-- Modal d'assignation -->
+                                                        <div class="modal fade" id="assignModal{{ tache.id }}" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog">
+                                                                <form action="{{ path('app_mission_tache_assigner', {'id': tache.id}) }}" method="POST">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">Assignation : {{ tache.libelleTache }}</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label">Employé</label>
+                                                                                <select name="employe" class="form-select" required>
+                                                                                    <option value="">Sélectionner un employé éligible...</option>
+                                                                                    {% for e in eligibleByTache[tache.id]|default([]) %}
+                                                                                        <option value="{{ e.id }}">{{ e.getFullName() }}</option>
+                                                                                    {% else %}
+                                                                                        <option value="" disabled>Aucun employé ne possède les compétences requises</option>
+                                                                                    {% endfor %}
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="mb-3">
+                                                                                <label class="form-label">Rôle sur la mission</label>
+                                                                                <input type="text" name="role" class="form-control" placeholder="Ex: Auditeur junior, Chef d'équipe...">
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                                            <button type="submit" class="btn btn-primary">Valider l'assignation</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

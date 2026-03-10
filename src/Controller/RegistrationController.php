@@ -5,7 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Utilisateurs;
 use App\Form\RegistrationFormType;
-use App\Repository\EmployesRepository;
+use App\Repository\EmployeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +20,7 @@ class RegistrationController extends AbstractController
         Request $request, 
         UserPasswordHasherInterface $userPasswordHasher, 
         EntityManagerInterface $entityManager,
-        EmployesRepository $employesRepository
+        EmployeRepository $employesRepository
     ): Response
     {
         $user = new Utilisateurs();

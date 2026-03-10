@@ -90,8 +90,8 @@
                                 {% for mission in missionsAnnee %}
                                 <div class="card border-0 bg-light mb-3">
                                     <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-8">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between gap-4 w-100">
+                                            <div class="flex-grow-1">
                                                 <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
                                                     <h6 class="mb-0">{{ mission.noMission }}</h6>
                                                     <span class="badge bg-secondary bg-opacity-10 text-secondary">
@@ -102,11 +102,11 @@
                                                     </span>
                                                 </div>
                                                 
-                                                <p class="text-muted small mb-2">
+                                                <p class="text-muted small mb-3">
                                                     {{ mission.description|slice(0, 150) }}...
                                                 </p>
                                                 
-                                                <div class="d-flex flex-wrap gap-3 small">
+                                                <div class="d-flex flex-wrap gap-3 small mt-auto">
                                                     <span>
                                                         <i class="far fa-calendar-alt me-1 text-muted"></i>
                                                         {{ mission.dateDebut|date('d/m/Y') }} - {{ mission.dateFinPrevue|date('d/m/Y') }}
@@ -121,23 +121,21 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
-                                                <div class="d-flex flex-column align-items-end">
-                                                    <div class="mb-2">
-                                                        <span class="badge bg-success px-3 py-2">
-                                                            <i class="fas fa-check-circle me-1"></i>{{ mission.statut|capitalize }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="d-flex gap-2">
-                                                        <a href="/missions/historique/mission/{{ mission.id }}" 
-                                                           class="btn btn-sm btn-outline-primary">
-                                                            <i class="fas fa-eye me-1"></i>Détails
-                                                        </a>
-                                                        <a href="/missions/historique/mission/{{ mission.id }}/rapport" 
-                                                           class="btn btn-sm btn-outline-secondary">
-                                                            <i class="fas fa-file-pdf me-1"></i>Rapport
-                                                        </a>
-                                                    </div>
+                                            <div class="d-flex flex-column justify-content-between align-items-md-end gap-3 min-vw-auto">
+                                                <div>
+                                                    <span class="badge bg-success px-3 py-2 fs-6 shadow-sm">
+                                                        <i class="fas fa-check-circle me-1"></i>{{ mission.statut|capitalize }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ path('app_mission_show', {'id': mission.id}) }}" 
+                                                       class="btn btn-primary d-flex align-items-center gap-2">
+                                                        <i class="fas fa-eye"></i>Détails
+                                                    </a>
+                                                    <a href="{{ path('app_mission_historique_rapport', {'id': mission.id}) }}" 
+                                                       class="btn btn-light border d-flex align-items-center gap-2 text-secondary">
+                                                        <i class="fas fa-file-pdf"></i>Rapport
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>

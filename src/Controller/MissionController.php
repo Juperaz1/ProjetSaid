@@ -85,7 +85,7 @@ class MissionController extends AbstractController
         if (!empty($filters)) {
             $missions = $missionRepository->findByFilters($filters);
         } else {
-            $missions = $missionRepository->findBy([], ['dateCreation' => 'DESC']);
+            $missions = $missionRepository->findActiveMissions();
         }
         
         $stats = [
@@ -299,11 +299,87 @@ class MissionController extends AbstractController
         
         $taches = $mission->getTaches();
         
+        $levelWeights = [
+            'débutant' => 1,
+            'intermédiaire' => 2,
+            'avancé' => 3,
+            'expert' => 4,
+        ];
+
+        $allActiveEmployes = $entityManager->getRepository(Employes::class)->findBy(['statut' => 'actif'], ['nomEmploye' => 'ASC']);
+        $eligibleByTache = [];
+
+        foreach ($taches as $tache) {
+            $requiredCompetences = $tache->getTachesCompetences();
+            
+            if ($requiredCompetences->isEmpty()) {
+                $eligibleByTache[$tache->getId()] = $allActiveEmployes;
+                continue;
+            }
+
+            $eligible = array_filter($allActiveEmployes, function($employe) use ($requiredCompetences, $levelWeights) {
+                // Créer un map des compétences de l'employé pour une recherche rapide
+                $employeCompetences = [];
+                foreach ($employe->getEmployesCompetences() as $ec) {
+                    $employeCompetences[$ec->getCompetence()->getId()] = $levelWeights[$ec->getNiveau()] ?? 0;
+                }
+
+                // Vérifier chaque compétence requise
+                foreach ($requiredCompetences as $rc) {
+                    $compId = $rc->getCompetence()->getId();
+                    $requiredLevel = $levelWeights[$rc->getNiveauRequis()] ?? 0;
+                    
+                    if (!isset($employeCompetences[$compId]) || $employeCompetences[$compId] < $requiredLevel) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            
+            $eligibleByTache[$tache->getId()] = array_values($eligible);
+        }
+        
         return $this->render('mission/show.html.twig', [
             'mission' => $mission,
-            'taches' => $taches
+            'taches' => $taches,
+            'eligibleByTache' => $eligibleByTache,
+            'employes' => $allActiveEmployes
         ]);
     }
+
+    #[Route('/mission/tache/{id}/assigner', name: 'app_mission_tache_assigner', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function assignerTache(int $id, Request $request, EntityManagerInterface $entityManager, EmployeRepository $employeRepository): Response
+    {
+        $tache = $entityManager->getRepository(Tache::class)->find($id);
+        if (!$tache) {
+            throw $this->createNotFoundException('Tâche non trouvée');
+        }
+
+        $idEmploye = $request->request->get('employe');
+        $role = $request->request->get('role') ?: 'Intervenant';
+        
+        $employe = $employeRepository->find($idEmploye);
+        if (!$employe) {
+            $this->addFlash('error', 'Employé non trouvé');
+            return $this->redirectToRoute('app_mission_show', ['id' => $tache->getMission()->getId()]);
+        }
+
+        $affectation = new Affectation();
+        $affectation->setTache($tache);
+        $affectation->setEmploye($employe);
+        $affectation->setRoleMission($role);
+        $affectation->setDateAffectation(new \DateTime());
+        $affectation->setStatut('active');
+
+        $entityManager->persist($affectation);
+        $entityManager->flush();
+
+        $this->addFlash('success', sprintf('L\'employé %s a été assigné à la tâche %s', $employe->getFullName(), $tache->getLibelleTache()));
+
+        return $this->redirectToRoute('app_mission_show', ['id' => $tache->getMission()->getId()]);
+    }
+
 
     #[Route('/mission/{id}/edit', name: 'app_mission_edit')]
     #[IsGranted('ROLE_USER')]
@@ -420,6 +496,8 @@ class MissionController extends AbstractController
             }
             
             try {
+                $mission->mettreAJourAvancement();
+                
                 $entityManager->flush();
                 $this->addFlash('success', 'Mission mise à jour avec succès.');
                 return $this->redirectToRoute('app_mission_show', ['id' => $mission->getId()]);

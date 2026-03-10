@@ -44,7 +44,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Tâches</h5>
                             <p class="card-text">Suivez vos tâches</p>
-                            <a href="{{ path('app_mission_index') }}" class="btn btn-primary">Voir les tâches</a>
+                            <a href="{{ path('app_tache_index') }}" class="btn btn-primary">Voir les tâches</a>
                         </div>
                     </div>
                 </div>
@@ -79,34 +79,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Statistiques</h5>
-                            <p class="card-text">Statistiques des missions</p>
-                            <a href="{{ path('app_mission_historique_stats', {'annee': 'now'|date('Y')}) }}" class="btn btn-secondary">Voir les stats</a>
-                        </div>
-                    </div>
-                </div>
             </div>
-
-            <!-- Section des statistiques pour les responsables -->
-            {% if 'ROLE_RESPONSABLE' in app.user.roles %}
-                <div class="row mt-5">
-                    <div class="col-12">
-                        <h2 class="mb-3">Statistiques responsables</h2>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h5 class="card-title">Dashboard statistiques</h5>
-                                <p class="card-text">Statistiques détaillées du tableau de bord</p>
-                                <a href="{{ path('app_dashboard_stats') }}" class="btn btn-info">Voir le dashboard</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
         </div>
     </div>
 </div>

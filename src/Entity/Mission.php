@@ -65,8 +65,7 @@ class Mission
     #[ORM\Column(name: "DateCreation", type: "datetime", nullable: true, options: ["default" => "CURRENT_TIMESTAMP"])]
     private ?\DateTimeInterface $dateCreation = null;
 
-    #[ORM\OneToMany(mappedBy: 'mission', targetEntity: Affectation::class)]
-    private Collection $affectations;
+
 
     #[ORM\OneToMany(mappedBy: 'mission', targetEntity: Tache::class)]
     private Collection $taches;
@@ -76,7 +75,6 @@ class Mission
 
     public function __construct()
     {
-        $this->affectations = new ArrayCollection();
         $this->taches = new ArrayCollection();
         $this->plannings = new ArrayCollection();
     }
@@ -218,32 +216,7 @@ class Mission
         return $this;
     }
 
-    /**
-     * @return Collection<int, Affectation>
-     */
-    public function getAffectations(): Collection
-    {
-        return $this->affectations;
-    }
 
-    public function addAffectation(Affectation $affectation): self
-    {
-        if (!$this->affectations->contains($affectation)) {
-            $this->affectations->add($affectation);
-            $affectation->setMission($this);
-        }
-        return $this;
-    }
-
-    public function removeAffectation(Affectation $affectation): self
-    {
-        if ($this->affectations->removeElement($affectation)) {
-            if ($affectation->getMission() === $this) {
-                $affectation->setMission(null);
-            }
-        }
-        return $this;
-    }
 
     /**
      * @return Collection<int, Tache>
@@ -270,5 +243,31 @@ class Mission
             }
         }
         return $this;
+    }
+
+    public function mettreAJourAvancement(): void
+    {
+        $totalTaches = count($this->taches);
+        
+        if ($totalTaches === 0) {
+            $this->avancementPourcentage = '0.00';
+            return;
+        }
+
+        $tachesTerminees = 0;
+        foreach ($this->taches as $tache) {
+            if ($tache->getStatut() === 'terminée') {
+                $tachesTerminees++;
+            }
+        }
+
+        $pourcentage = ($tachesTerminees / $totalTaches) * 100;
+        $this->avancementPourcentage = number_format($pourcentage, 2, '.', '');
+
+        if ($pourcentage == 100) {
+            $this->statut = 'terminée';
+        } elseif ($pourcentage > 0 && $this->statut === 'prévue') {
+            $this->statut = 'en cours';
+        }
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Employes;
-use App\Entity\Missions;
-use App\Entity\FEUILLESTEMPS;
+use App\Entity\Mission;
+use App\Entity\FeuilleTemps;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,16 +21,19 @@ class DashboardController extends AbstractController
         $employe = $user->getEmploye();
         
         // Récupérer les missions de l'employé
-        $missions = $entityManager->createQueryBuilder()
-            ->select('m')
-            ->from(Missions::class, 'm')
-            ->leftJoin('m.taches', 't')
-            ->leftJoin('t.affectations', 'a')
-            ->where('a.IdEmploye = :employeId')
-            ->setParameter('employeId', $employe->getId())
-            ->orderBy('m.DateDebut', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $missions = [];
+        if ($employe) {
+            $missions = $entityManager->createQueryBuilder()
+                ->select('m')
+                ->from(Mission::class, 'm')
+                ->leftJoin('m.taches', 't')
+                ->leftJoin('t.affectations', 'a')
+                ->where('a.employe = :employe')
+                ->setParameter('employe', $employe)
+                ->orderBy('m.dateDebut', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
         
         // Statistiques
         $stats = [
@@ -54,19 +57,23 @@ class DashboardController extends AbstractController
         $stats['labelsTemps'] = array_keys($statsTemps);
         $stats['dataTemps'] = array_values($statsTemps);
         
-        // Récupérer tous les employés pour l'attribution
-        $employes = $entityManager->getRepository(Employes::class)->findAll();
-        
         // Récupérer les saisies de temps récentes
-        $saisiesTemps = $entityManager->getRepository(FEUILLESTEMPS::class)
-            ->createQueryBuilder('f')
-            ->where('f.IdEmploye = :employeId')
-            ->setParameter('employeId', $employe->getId())
-            ->orderBy('f.DateTravail', 'DESC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult();
+        $saisiesTemps = [];
+        if ($employe) {
+            $saisiesTemps = $entityManager->getRepository(FeuilleTemps::class)
+                ->createQueryBuilder('f')
+                ->join('f.affectation', 'a')
+                ->where('a.employe = :employe')
+                ->setParameter('employe', $employe)
+                ->orderBy('f.dateTravail', 'DESC')
+                ->setMaxResults(10)
+                ->getQuery()
+                ->getResult();
+        }
         
+        // Récupérer tous les employés actifs (utilisé par le template ?)
+        $employes = $entityManager->getRepository(Employes::class)->findBy(['statut' => 'actif']);
+
         return $this->render('dashboard/index.html.twig', [
             'missions' => $missions,
             'employes' => $employes,
@@ -80,12 +87,13 @@ class DashboardController extends AbstractController
         $debutMois = new \DateTime('first day of this month');
         $finMois = new \DateTime('last day of this month');
         
-        $result = $entityManager->getRepository(FEUILLESTEMPS::class)
+        $result = $entityManager->getRepository(FeuilleTemps::class)
             ->createQueryBuilder('f')
-            ->select('SUM(f.HeuresEffectuees)')
-            ->where('f.IdEmploye = :employeId')
-            ->andWhere('f.DateTravail BETWEEN :debut AND :fin')
-            ->setParameter('employeId', $employe->getId())
+            ->select('SUM(f.heuresEffectuees)')
+            ->join('f.affectation', 'a')
+            ->where('a.employe = :employe')
+            ->andWhere('f.dateTravail BETWEEN :debut AND :fin')
+            ->setParameter('employe', $employe)
             ->setParameter('debut', $debutMois)
             ->setParameter('fin', $finMois)
             ->getQuery()
@@ -96,13 +104,15 @@ class DashboardController extends AbstractController
     
     private function compterTachesTerminees(EntityManagerInterface $entityManager, $employe): int
     {
+        if (!$employe) return 0;
+
         return $entityManager->createQueryBuilder()
             ->select('COUNT(t)')
-            ->from('App\Entity\TACHES', 't')
+            ->from(Tache::class, 't')
             ->leftJoin('t.affectations', 'a')
-            ->where('a.IdEmploye = :employeId')
-            ->andWhere('t.Statut = :statut')
-            ->setParameter('employeId', $employe->getId())
+            ->where('a.employe = :employe')
+            ->andWhere('t.statut = :statut')
+            ->setParameter('employe', $employe)
             ->setParameter('statut', 'terminée')
             ->getQuery()
             ->getSingleScalarResult();
@@ -111,9 +121,9 @@ class DashboardController extends AbstractController
     private function getStatsMissions(EntityManagerInterface $entityManager): array
     {
         $result = $entityManager->createQueryBuilder()
-            ->select('m.Statut as statut, COUNT(m) as count')
-            ->from(Missions::class, 'm')
-            ->groupBy('m.Statut')
+            ->select('m.statut as statut, COUNT(m) as count')
+            ->from(Mission::class, 'm')
+            ->groupBy('m.statut')
             ->getQuery()
             ->getResult();
             
@@ -127,13 +137,17 @@ class DashboardController extends AbstractController
     
     private function getStatsTemps(EntityManagerInterface $entityManager, $employe): array
     {
-        $result = $entityManager->getRepository(FEUILLESTEMPS::class)
+        if (!$employe) return [];
+
+        $result = $entityManager->getRepository(FeuilleTemps::class)
             ->createQueryBuilder('f')
-            ->select('m.NoMission as mission, SUM(f.HeuresEffectuees) as heures')
-            ->join('f.IdMission', 'm')
-            ->where('f.IdEmploye = :employeId')
-            ->groupBy('m.NoMission')
-            ->setParameter('employeId', $employe->getId())
+            ->select('m.noMission as mission, SUM(f.heuresEffectuees) as heures')
+            ->join('f.affectation', 'a')
+            ->join('a.tache', 't')
+            ->join('t.mission', 'm')
+            ->where('a.employe = :employe')
+            ->groupBy('m.noMission')
+            ->setParameter('employe', $employe)
             ->orderBy('heures', 'DESC')
             ->setMaxResults(5)
             ->getQuery()

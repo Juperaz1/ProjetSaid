@@ -30,9 +30,15 @@ class MissionRepository extends ServiceEntityRepository
     /**
      * Recherche avancée avec filtres
      */
-    public function findByFilters(?array $filters = []): array
+    public function findByFilters(?array $filters = [], bool $excludeTerminee = true): array
     {
         $qb = $this->createQueryBuilder('m')->leftJoin('m.client', 'c')->leftJoin('m.typeMission', 't')->leftJoin('m.responsable', 'r');
+        
+        // Si on ne filtre pas explicitement sur un statut, et qu'on veut exclure les terminées
+        if (empty($filters['statut']) && $excludeTerminee) {
+            $qb->andWhere('m.statut != :statusExclu')->setParameter('statusExclu', 'terminée');
+        }
+
         if(!empty($filters['client']))
         {
             $qb->andWhere('c.id = :client')->setParameter('client', $filters['client']);
@@ -59,6 +65,19 @@ class MissionRepository extends ServiceEntityRepository
             $qb->andWhere('m.noMission LIKE :search OR c.nomClient LIKE :search')->setParameter('search', $search);
         }
         return $qb->orderBy('m.dateCreation', 'DESC')->getQuery()->getResult();
+    }
+
+    /**
+     * Retourne toutes les missions actives (non terminées)
+     */
+    public function findActiveMissions(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.statut != :status')
+            ->setParameter('status', 'terminée')
+            ->orderBy('m.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function testMethod(): array

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Entity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -20,14 +22,25 @@ class Affectation
     #[ORM\JoinColumn(name: "IdEmploye", referencedColumnName: "IdEmploye", nullable: false)]
     private ?Employes $employe = null;
 
-    #[ORM\Column(name: "RoleMission", type: "string", length: 100, nullable: true)]
+    #[ORM\Column(name: "Role", type: "string", length: 100, nullable: true)]
     private ?string $roleMission = null;
+
+    #[ORM\Column(name: "Statut", type: "string", columnDefinition: "enum('active','terminée','annulée')", options: ["default" => "active"])]
+    private ?string $statut = 'active';
 
     #[ORM\Column(name: "DateAffectation", type: "date")]
     private ?\DateTimeInterface $dateAffectation = null;
 
     #[ORM\Column(name: "DateFinAffectation", type: "date", nullable: true)]
     private ?\DateTimeInterface $dateFinAffectation = null;
+
+    #[ORM\OneToMany(mappedBy: 'affectation', targetEntity: FeuilleTemps::class)]
+    private Collection $feuillesTemps;
+
+    public function __construct()
+    {
+        $this->feuillesTemps = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -87,5 +100,24 @@ class Affectation
     {
         $this->dateFinAffectation = $dateFinAffectation;
         return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): self
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FeuilleTemps>
+     */
+    public function getFeuillesTemps(): Collection
+    {
+        return $this->feuillesTemps;
     }
 }
