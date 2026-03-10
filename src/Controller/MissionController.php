@@ -23,11 +23,51 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class MissionController extends AbstractController
 {
+    /**
+     * Nettoie une valeur numérique (enlève les espaces, remplace la virgule par le point)
+     */
+    private function nettoyerNombre(?string $valeur): ?string
+    {
+        if ($valeur === null || trim($valeur) === '') {
+            return null;
+        }
+        
+        // Enlever tous les espaces (insécables ou non)
+        $valeur = preg_replace('/\s+/', '', trim($valeur));
+        
+        // Remplacer la virgule par le point
+        $valeur = str_replace(',', '.', $valeur);
+        
+        // Vérifier que c'est un nombre valide
+        if (!is_numeric($valeur)) {
+            return null;
+        }
+        
+        // Formater avec 2 décimales maximum
+        return number_format((float)$valeur, 2, '.', '');
+    }
+
+    /**
+     * Valide qu'un nombre ne dépasse pas la limite
+     */
+    private function validerLimiteNombre(?string $valeur, float $max, string $nomChamp): ?string
+    {
+        if ($valeur === null) {
+            return null;
+        }
+        
+        $nombre = floatval($valeur);
+        if ($nombre > $max) {
+            $this->addFlash('error', "Le champ '$nomChamp' ne peut pas dépasser " . number_format($max, 2, ',', ' '));
+            return null;
+        }
+        
+        return $valeur;
+    }
+
     #[Route('/mission', name: 'app_mission_index')]
     #[IsGranted('ROLE_USER')]
-    public function index(Request $request, MissionRepository $missionRepository, ClientRepository $clientRepository, TypeMissionRepository $typeMissionRepository)
-    :
-    Response
+    public function index(Request $request, MissionRepository $missionRepository, ClientRepository $clientRepository, TypeMissionRepository $typeMissionRepository): Response
     {
         $filters = [
             'client' => $request->query->get('client'),
@@ -37,18 +77,17 @@ class MissionController extends AbstractController
             'dateFin' => $request->query->get('dateFin'),
             'search' => $request->query->get('search')
         ];
-        $filters = array_filter($filters, function($value)
-        {
+        
+        $filters = array_filter($filters, function($value) {
             return $value !== null && $value !== '';
         });
-        if(!empty($filters))
-        {
+        
+        if (!empty($filters)) {
             $missions = $missionRepository->findByFilters($filters);
-        }
-        else
-        {
+        } else {
             $missions = $missionRepository->findBy([], ['dateCreation' => 'DESC']);
         }
+        
         $stats = [
             'total' => count($missions),
             'en_cours' => 0,
@@ -57,10 +96,9 @@ class MissionController extends AbstractController
             'en_pause' => 0,
             'annulees' => 0
         ];
-        foreach($missions as $mission)
-        {
-            switch($mission->getStatut())
-            {
+        
+        foreach ($missions as $mission) {
+            switch ($mission->getStatut()) {
                 case 'en cours':
                     $stats['en_cours']++;
                     break;
@@ -78,8 +116,10 @@ class MissionController extends AbstractController
                     break;
             }
         }
+        
         $clients = $clientRepository->findAll();
         $types = $typeMissionRepository->findAll();
+        
         return $this->render('mission/index.html.twig', [
             'missions' => $missions,
             'stats' => $stats,
@@ -91,82 +131,131 @@ class MissionController extends AbstractController
     
     #[Route('/mission/creer', name: 'app_mission_creer')]
     #[IsGranted('ROLE_USER')]
-    public function creerMission(Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository, TypeMissionRepository $typeMissionRepository, EmployeRepository $employeRepository, CompetenceRepository $competenceRepository)
-    :
-    Response
+    public function creerMission(
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        ClientRepository $clientRepository, 
+        TypeMissionRepository $typeMissionRepository, 
+        EmployeRepository $employeRepository, 
+        CompetenceRepository $competenceRepository
+    ): Response
     {
         $clients = $clientRepository->findBy([], ['nomClient' => 'ASC']);
         $typesMission = $typeMissionRepository->findBy([], ['libelleTypeMission' => 'ASC']);
         $responsables = $employeRepository->findBy(['estResponsable' => true, 'statut' => 'actif'], ['nomEmploye' => 'ASC']);
         $competences = $competenceRepository->findAllOrdered();    
-        if($request->isMethod('POST'))
-        {
+        
+        if ($request->isMethod('POST')) {
             $mission = new Mission();
+            
+            // Génération du numéro de mission
             $annee = date('Y');
-            $lastMission = $entityManager->createQueryBuilder()->select('m')->from(Mission::class, 'm')->where('m.noMission LIKE :pattern')->setParameter('pattern', "MISSION-$annee-%")->orderBy('m.noMission', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
-            if($lastMission)
-            {
+            $lastMission = $entityManager->createQueryBuilder()
+                ->select('m')
+                ->from(Mission::class, 'm')
+                ->where('m.noMission LIKE :pattern')
+                ->setParameter('pattern', "MISSION-$annee-%")
+                ->orderBy('m.noMission', 'DESC')
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+            
+            if ($lastMission) {
                 $lastNumber = intval(substr($lastMission->getNoMission(), -3));
                 $newNumber = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-            }
-            else
-            {
+            } else {
                 $newNumber = '001';
             }
+            
             $mission->setNoMission("MISSION-$annee-$newNumber");
-            $mission->setClient($clientRepository->find($request->request->get('client')));
-            $mission->setTypeMission($typeMissionRepository->find($request->request->get('type_mission')));
+            
+            // Client
+            $clientId = $request->request->get('client');
+            if ($clientId) {
+                $mission->setClient($clientRepository->find($clientId));
+            }
+            
+            // Type de mission
+            $typeMissionId = $request->request->get('type_mission');
+            if ($typeMissionId) {
+                $mission->setTypeMission($typeMissionRepository->find($typeMissionId));
+            }
+            
+            // Dates
             $dateDebut = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_debut'));
-            $mission->setDateDebut($dateDebut);
+            if ($dateDebut) {
+                $mission->setDateDebut($dateDebut);
+            }
+            
             $dateFin = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_fin'));
-            $mission->setDateFinPrevue($dateFin);
+            if ($dateFin) {
+                $mission->setDateFinPrevue($dateFin);
+            }
+            
+            // Description
             $mission->setDescription($request->request->get('description'));
-            $budgetEuro = $request->request->get('budget_euro');
-            if(!empty($budgetEuro))
-            {
-                $mission->setBudgetEuro(str_replace(',', '.', $budgetEuro));
+            
+            // Budget Euro (avec nettoyage et validation)
+            $budgetEuro = $this->nettoyerNombre($request->request->get('budget_euro'));
+            $budgetEuro = $this->validerLimiteNombre($budgetEuro, 99999999.99, 'Budget (€)');
+            if ($budgetEuro !== null) {
+                $mission->setBudgetEuro($budgetEuro);
             }
-            $budgetHeures = $request->request->get('budget_heures');
-            if(!empty($budgetHeures))
-            {
-                $mission->setBudgetHeures(str_replace(',', '.', $budgetHeures));
+            
+            // Budget Heures (avec nettoyage et validation)
+            $budgetHeures = $this->nettoyerNombre($request->request->get('budget_heures'));
+            $budgetHeures = $this->validerLimiteNombre($budgetHeures, 999999.99, 'Budget (heures)');
+            if ($budgetHeures !== null) {
+                $mission->setBudgetHeures($budgetHeures);
             }
+            
+            // Responsable
             $idResponsable = $request->request->get('responsable');
-            if(!empty($idResponsable))
-            {
+            if (!empty($idResponsable)) {
                 $mission->setResponsable($employeRepository->find($idResponsable));
             }
+            
             $mission->setStatut('prévue');
             $mission->setAvancementPourcentage('0.00');
             $mission->setDateCreation(new \DateTime());
+            
+            $entityManager->persist($mission);
+            
+            // Traitement des tâches - CORRECTION ICI
             $tachesLibelles = $request->request->all('tache_libelle');
             $tachesDescriptions = $request->request->all('tache_description');
             $tachesDurees = $request->request->all('tache_duree');
             $tachesPriorites = $request->request->all('tache_priorite');
             $tachesCompetences = $request->request->all('tache_competences');
             $tachesNiveaux = $request->request->all('tache_niveau');
-            if(!empty($tachesLibelles))
-            {
-                foreach($tachesLibelles as $index => $libelle)
-                {
-                    if(!empty($libelle))
-                    {
+            
+            if (!empty($tachesLibelles) && is_array($tachesLibelles)) {
+                foreach ($tachesLibelles as $index => $libelle) {
+                    if (!empty($libelle)) {
                         $tache = new Tache();
                         $tache->setMission($mission);
                         $tache->setLibelleTache($libelle);
+                        
+                        // Description - utiliser all() et vérifier l'existence
                         $tache->setDescription($tachesDescriptions[$index] ?? null);
-                        $tache->setDureeEstimee(!empty($tachesDurees[$index]) ? str_replace(',', '.', $tachesDurees[$index]) : null);
+                        
+                        // Durée estimée (avec nettoyage)
+                        $duree = isset($tachesDurees[$index]) ? $this->nettoyerNombre($tachesDurees[$index]) : null;
+                        $duree = $this->validerLimiteNombre($duree, 999999.99, 'Durée estimée');
+                        $tache->setDureeEstimee($duree);
+                        
+                        // Priorité
                         $tache->setPriorite($tachesPriorites[$index] ?? 'moyenne');
                         $tache->setStatut('à faire');
                         $tache->setDateDebutPrevue($mission->getDateDebut());
                         $tache->setDateFinPrevue($mission->getDateFinPrevue());
-                        $entityManager->persist($tache);    
-                        if(isset($tachesCompetences[$index]) && is_array($tachesCompetences[$index]))
-                        {
-                            foreach($tachesCompetences[$index] as $compIndex => $competenceId)
-                            {
-                                if(!empty($competenceId) && isset($tachesNiveaux[$index][$compIndex]))
-                                {
+                        
+                        $entityManager->persist($tache);
+                        
+                        // Compétences requises pour la tâche
+                        if (isset($tachesCompetences[$index]) && is_array($tachesCompetences[$index])) {
+                            foreach ($tachesCompetences[$index] as $compIndex => $competenceId) {
+                                if (!empty($competenceId) && isset($tachesNiveaux[$index][$compIndex])) {
                                     $tacheCompetence = new TachesCompetences();
                                     $tacheCompetence->setTache($tache);
                                     $tacheCompetence->setCompetence($competenceRepository->find($competenceId));
@@ -178,11 +267,16 @@ class MissionController extends AbstractController
                     }
                 }
             }
-            $entityManager->persist($mission);
-            $entityManager->flush();
-            $this->addFlash('success', 'Mission créée avec succès. Numéro : ' . $mission->getNoMission());
-            return $this->redirectToRoute('app_mission_index');
+            
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Mission créée avec succès. Numéro : ' . $mission->getNoMission());
+                return $this->redirectToRoute('app_mission_index');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la création de la mission : ' . $e->getMessage());
+            }
         }
+        
         return $this->render('mission/creer.html.twig', [
             'clients' => $clients,
             'types_mission' => $typesMission,
@@ -198,11 +292,13 @@ class MissionController extends AbstractController
     public function show(int $id, EntityManagerInterface $entityManager): Response
     {        
         $mission = $entityManager->getRepository(Mission::class)->find($id);        
-        if(!$mission)
-        {
+        
+        if (!$mission) {
             throw $this->createNotFoundException('La mission avec l\'id ' . $id . ' n\'existe pas.');
         }
+        
         $taches = $mission->getTaches();
+        
         return $this->render('mission/show.html.twig', [
             'mission' => $mission,
             'taches' => $taches
@@ -211,66 +307,106 @@ class MissionController extends AbstractController
 
     #[Route('/mission/{id}/edit', name: 'app_mission_edit')]
     #[IsGranted('ROLE_USER')]
-    public function editMission(Mission $mission, Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository, TypeMissionRepository $typeMissionRepository, EmployeRepository $employeRepository, CompetenceRepository $competenceRepository)
-    :
-    Response
+    public function editMission(
+        Mission $mission, 
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        ClientRepository $clientRepository, 
+        TypeMissionRepository $typeMissionRepository, 
+        EmployeRepository $employeRepository, 
+        CompetenceRepository $competenceRepository
+    ): Response
     {
         $clients = $clientRepository->findBy([], ['nomClient' => 'ASC']);
         $typesMission = $typeMissionRepository->findBy([], ['libelleTypeMission' => 'ASC']);
         $responsables = $employeRepository->findBy(['estResponsable' => true, 'statut' => 'actif'], ['nomEmploye' => 'ASC']);
-        $competences = $competenceRepository->findAllOrdered(); // AJOUTER CETTE LIGNE
-        if($request->isMethod('POST'))
-        {
-            $mission->setClient($clientRepository->find($request->request->get('client')));
-            $mission->setTypeMission($typeMissionRepository->find($request->request->get('type_mission')));
+        $competences = $competenceRepository->findAllOrdered();
+        
+        if ($request->isMethod('POST')) {
+            // Client
+            $clientId = $request->request->get('client');
+            if ($clientId) {
+                $mission->setClient($clientRepository->find($clientId));
+            }
+            
+            // Type de mission
+            $typeMissionId = $request->request->get('type_mission');
+            if ($typeMissionId) {
+                $mission->setTypeMission($typeMissionRepository->find($typeMissionId));
+            }
+            
+            // Dates
             $dateDebut = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_debut'));
-            $mission->setDateDebut($dateDebut);
+            if ($dateDebut) {
+                $mission->setDateDebut($dateDebut);
+            }
+            
             $dateFin = \DateTime::createFromFormat('Y-m-d', $request->request->get('date_fin'));
-            $mission->setDateFinPrevue($dateFin);
+            if ($dateFin) {
+                $mission->setDateFinPrevue($dateFin);
+            }
+            
             $mission->setDescription($request->request->get('description'));
-            $budgetEuro = $request->request->get('budget_euro');
-            $mission->setBudgetEuro(!empty($budgetEuro) ? str_replace(',', '.', $budgetEuro) : null);
-            $budgetHeures = $request->request->get('budget_heures');
-            $mission->setBudgetHeures(!empty($budgetHeures) ? str_replace(',', '.', $budgetHeures) : null);
+            
+            // Budget Euro (avec nettoyage et validation)
+            $budgetEuro = $this->nettoyerNombre($request->request->get('budget_euro'));
+            $budgetEuro = $this->validerLimiteNombre($budgetEuro, 99999999.99, 'Budget (€)');
+            $mission->setBudgetEuro($budgetEuro);
+            
+            // Budget Heures (avec nettoyage et validation)
+            $budgetHeures = $this->nettoyerNombre($request->request->get('budget_heures'));
+            $budgetHeures = $this->validerLimiteNombre($budgetHeures, 999999.99, 'Budget (heures)');
+            $mission->setBudgetHeures($budgetHeures);
+            
+            // Responsable
             $idResponsable = $request->request->get('responsable');
             $mission->setResponsable(!empty($idResponsable) ? $employeRepository->find($idResponsable) : null);
+            
             $mission->setStatut($request->request->get('statut'));
-            foreach($mission->getTaches() as $ancienneTache)
-            {
-                foreach($ancienneTache->getTachesCompetences() as $tc)
-                {
+            
+            // Supprimer les anciennes tâches et leurs compétences
+            foreach ($mission->getTaches() as $ancienneTache) {
+                foreach ($ancienneTache->getTachesCompetences() as $tc) {
                     $entityManager->remove($tc);
                 }
                 $entityManager->remove($ancienneTache);
             }
+            
+            // Créer les nouvelles tâches - CORRECTION ICI AUSSI
             $tachesLibelles = $request->request->all('tache_libelle');
             $tachesDescriptions = $request->request->all('tache_description');
             $tachesDurees = $request->request->all('tache_duree');
             $tachesPriorites = $request->request->all('tache_priorite');
             $tachesCompetences = $request->request->all('tache_competences');
             $tachesNiveaux = $request->request->all('tache_niveau');
-            if(!empty($tachesLibelles))
-            {
-                foreach($tachesLibelles as $index => $libelle)
-                {
-                    if(!empty($libelle))
-                    {
+            
+            if (!empty($tachesLibelles) && is_array($tachesLibelles)) {
+                foreach ($tachesLibelles as $index => $libelle) {
+                    if (!empty($libelle)) {
                         $tache = new Tache();
                         $tache->setMission($mission);
                         $tache->setLibelleTache($libelle);
+                        
+                        // Description - utiliser all() et vérifier l'existence
                         $tache->setDescription($tachesDescriptions[$index] ?? null);
-                        $tache->setDureeEstimee(!empty($tachesDurees[$index]) ? str_replace(',', '.', $tachesDurees[$index]) : null);
+                        
+                        // Durée estimée (avec nettoyage)
+                        $duree = isset($tachesDurees[$index]) ? $this->nettoyerNombre($tachesDurees[$index]) : null;
+                        $duree = $this->validerLimiteNombre($duree, 999999.99, 'Durée estimée');
+                        $tache->setDureeEstimee($duree);
+                        
+                        // Priorité
                         $tache->setPriorite($tachesPriorites[$index] ?? 'moyenne');
                         $tache->setStatut('à faire');
                         $tache->setDateDebutPrevue($mission->getDateDebut());
                         $tache->setDateFinPrevue($mission->getDateFinPrevue());
+                        
                         $entityManager->persist($tache);
-                        if(isset($tachesCompetences[$index]) && is_array($tachesCompetences[$index]))
-                        {
-                            foreach($tachesCompetences[$index] as $compIndex => $competenceId)
-                            {
-                                if(!empty($competenceId) && isset($tachesNiveaux[$index][$compIndex]))
-                                {
+                        
+                        // Compétences requises
+                        if (isset($tachesCompetences[$index]) && is_array($tachesCompetences[$index])) {
+                            foreach ($tachesCompetences[$index] as $compIndex => $competenceId) {
+                                if (!empty($competenceId) && isset($tachesNiveaux[$index][$compIndex])) {
                                     $tacheCompetence = new TachesCompetences();
                                     $tacheCompetence->setTache($tache);
                                     $tacheCompetence->setCompetence($competenceRepository->find($competenceId));
@@ -282,9 +418,14 @@ class MissionController extends AbstractController
                     }
                 }
             }
-            $entityManager->flush();
-            $this->addFlash('success', 'Mission mise à jour avec succès.');
-            return $this->redirectToRoute('app_mission_show', ['id' => $mission->getId()]);
+            
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Mission mise à jour avec succès.');
+                return $this->redirectToRoute('app_mission_show', ['id' => $mission->getId()]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
+            }
         }
         
         return $this->render('mission/edit.html.twig', [
@@ -300,42 +441,52 @@ class MissionController extends AbstractController
 
     #[Route('/mission/{id}/delete', name: 'app_mission_delete', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function deleteMission(int $id, Request $request, EntityManagerInterface $entityManager)
-    :
-    Response
+    public function deleteMission(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
         $mission = $entityManager->getRepository(Mission::class)->find($id);
-        if(!$mission)
-        {
+        
+        if (!$mission) {
             throw $this->createNotFoundException('Mission non trouvée');
         }
-        if($this->isCsrfTokenValid('delete' . $mission->getId(), $request->request->get('_token')))
-        {
+        
+        if ($this->isCsrfTokenValid('delete' . $mission->getId(), $request->request->get('_token'))) {
             $tacheIds = [];
-            foreach($mission->getTaches() as $tache)
-            {
+            foreach ($mission->getTaches() as $tache) {
                 $tacheIds[] = $tache->getId();
             }
-            if(!empty($tacheIds))
-            {
-                $entityManager->createQueryBuilder()->delete(TachesCompetences::class, 'tc')->where('tc.tache IN (:tacheIds)')->setParameter('tacheIds', $tacheIds)->getQuery()->execute();
-            }
-            if(!empty($tacheIds))
-            {
-                $entityManager->createQueryBuilder()->delete(Affectation::class, 'a')->where('a.tache IN (:tacheIds)')->setParameter('tacheIds', $tacheIds)->getQuery()->execute();
+            
+            if (!empty($tacheIds)) {
+                $entityManager->createQueryBuilder()
+                    ->delete(TachesCompetences::class, 'tc')
+                    ->where('tc.tache IN (:tacheIds)')
+                    ->setParameter('tacheIds', $tacheIds)
+                    ->getQuery()
+                    ->execute();
+                
+                $entityManager->createQueryBuilder()
+                    ->delete(Affectation::class, 'a')
+                    ->where('a.tache IN (:tacheIds)')
+                    ->setParameter('tacheIds', $tacheIds)
+                    ->getQuery()
+                    ->execute();
             }            
-            foreach($mission->getTaches() as $tache)
-            {
+            
+            foreach ($mission->getTaches() as $tache) {
                 $entityManager->remove($tache);
             }
+            
             $entityManager->remove($mission);
-            $entityManager->flush();
-            $this->addFlash('success', 'Mission supprimée avec succès.');
-        }
-        else
-        {
+            
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'Mission supprimée avec succès.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la suppression : ' . $e->getMessage());
+            }
+        } else {
             $this->addFlash('error', 'Token CSRF invalide.');
         }
+        
         return $this->redirectToRoute('app_mission_index');
     }
 }

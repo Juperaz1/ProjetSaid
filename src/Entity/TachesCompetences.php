@@ -4,7 +4,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: "TACHES_COMPETENCES")]
+#[ORM\Table(name: "TACHES_COMPETENCES_REQUISES")]
 class TachesCompetences
 {
     #[ORM\Id]

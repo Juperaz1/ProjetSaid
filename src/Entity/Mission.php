@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: "MISSIONS")]
@@ -35,9 +36,19 @@ class Mission
     #[ORM\Column(name: "Description", type: "text", nullable: true)]
     private ?string $description = null;
 
+    #[Assert\Range(
+        min: 0,
+        max: 99999999.99,
+        notInRangeMessage: 'Le budget doit être entre {{ min }} et {{ max }} €',
+    )]
     #[ORM\Column(name: "BudgetEuro", type: "decimal", precision: 10, scale: 2, nullable: true)]
     private ?string $budgetEuro = null;
 
+    #[Assert\Range(
+        min: 0,
+        max: 999999.99,
+        notInRangeMessage: 'Le budget en heures doit être entre {{ min }} et {{ max }}',
+    )]
     #[ORM\Column(name: "BudgetHeures", type: "decimal", precision: 8, scale: 2, nullable: true)]
     private ?string $budgetHeures = null;
 
