@@ -1,79 +1,112 @@
-{# templates/dashboard/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord - Application{% endblock %}
+{% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
-<div class="container py-5">
+<div class="container">
     <div class="row">
         <div class="col-12">
-            <div class="jumbotron bg-light p-5 rounded">
-                <h1 class="display-4">Bienvenue sur votre espace personnel</h1>
-                
-                <p class="lead">
-                    Bonjour {{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }} !
-                </p>
-                
-                <hr class="my-4">
-                
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <i class="fas fa-user-circle me-2" style="color: var(--primary-color);"></i>
-                                    Mon profil
-                                </h5>
-                                <p class="card-text">
-                                    <strong>Email:</strong> {{ app.user.employe.emailEmploye }}<br>
-                                    <strong>Site:</strong> 
-                                    {% if app.user.employe.site %}
-                                        {{ app.user.employe.site.villeSite ?? 'Site #' ~ app.user.employe.site.id }}
-                                    {% else %}
-                                        Non assigné
-                                    {% endif %}<br>
-                                    <strong>Rôle:</strong> 
-                                    {% if app.user.employe.estResponsable %}
-                                        <span class="badge bg-primary">Responsable</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Employé</span>
-                                    {% endif %}
-                                </p>
-                            </div>
+            <h1 class="mb-4">Tableau de bord</h1>
+            
+            {% if app.user %}
+                <div class="alert alert-info">
+                    {% if app.user.employe %}
+                        <p>Bonjour <strong>{{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}</strong> !</p>
+                    {% else %}
+                        <p>Bonjour <strong>{{ app.user.login }}</strong> !</p>
+                    {% endif %}
+                    
+                    <p>Vous êtes connecté en tant que : 
+                        <strong>
+                            {% if 'ROLE_RESPONSABLE' in app.user.roles %}
+                                Responsable
+                            {% else %}
+                                Utilisateur
+                            {% endif %}
+                        </strong>
+                    </p>
+                </div>
+            {% endif %}
+            
+            <!-- Cartes principales -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Missions</h5>
+                            <p class="card-text">Gérez vos missions</p>
+                            <a href="{{ path('app_mission_index') }}" class="btn btn-primary">Voir les missions</a>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <i class="fas fa-tasks me-2" style="color: var(--success-color);"></i>
-                                    Mes missions
-                                </h5>
-                                <p class="card-text">Consultez et gérez vos missions en cours</p>
-                                <a href="{{ path('app_mission_index') }}" class="btn btn-primary">
-                                    <i class="fas fa-eye me-1"></i>Voir mes missions
-                                </a>
-                            </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tâches</h5>
+                            <p class="card-text">Suivez vos tâches</p>
+                            <a href="{{ path('app_mission_index') }}" class="btn btn-primary">Voir les tâches</a>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100 shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">
-                                    <i class="fas fa-clock me-2" style="color: var(--warning-color);"></i>
-                                    Mes feuilles de temps
-                                </h5>
-                                <p class="card-text">Saisissez et suivez vos feuilles de temps</p>
-                                <a href="#" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle me-1"></i>Voir mes feuilles
-                                </a>
-                            </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Feuilles de temps</h5>
+                            <p class="card-text">Consultez vos feuilles de temps</p>
+                            <a href="{{ path('app_feuille_temps_index') }}" class="btn btn-primary">Voir les feuilles</a>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Deuxième ligne de cartes - avec les routes qui existent -->
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Nouvelle feuille</h5>
+                            <p class="card-text">Créer une nouvelle feuille de temps</p>
+                            <a href="{{ path('app_feuille_temps_nouvelle') }}" class="btn btn-secondary">Nouvelle feuille</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Historique missions</h5>
+                            <p class="card-text">Consulter l'historique des missions</p>
+                            <a href="{{ path('app_mission_historique') }}" class="btn btn-secondary">Voir l'historique</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Statistiques</h5>
+                            <p class="card-text">Statistiques des missions</p>
+                            <a href="{{ path('app_mission_historique_stats', {'annee': 'now'|date('Y')}) }}" class="btn btn-secondary">Voir les stats</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section des statistiques pour les responsables -->
+            {% if 'ROLE_RESPONSABLE' in app.user.roles %}
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <h2 class="mb-3">Statistiques responsables</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Dashboard statistiques</h5>
+                                <p class="card-text">Statistiques détaillées du tableau de bord</p>
+                                <a href="{{ path('app_dashboard_stats') }}" class="btn btn-info">Voir le dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

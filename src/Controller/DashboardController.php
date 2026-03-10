@@ -1,0 +1,149 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Employes;
+use App\Entity\Missions;
+use App\Entity\FEUILLESTEMPS;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class DashboardController extends AbstractController
+{
+    #[Route('/dashboard', name: 'app_dashboard')]
+    public function index(EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        $user = $this->getUser();
+        $employe = $user->getEmploye();
+        
+        // Récupérer les missions de l'employé
+        $missions = $entityManager->createQueryBuilder()
+            ->select('m')
+            ->from(Missions::class, 'm')
+            ->leftJoin('m.taches', 't')
+            ->leftJoin('t.affectations', 'a')
+            ->where('a.IdEmploye = :employeId')
+            ->setParameter('employeId', $employe->getId())
+            ->orderBy('m.DateDebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+        
+        // Statistiques
+        $stats = [
+            'missionsEnCours' => count(array_filter($missions, function($m) {
+                return $m->getStatut() === 'en cours';
+            })),
+            'heuresMois' => $this->calculerHeuresMois($entityManager, $employe),
+            'tachesTerminees' => $this->compterTachesTerminees($entityManager, $employe),
+            'labelsMissions' => [],
+            'dataMissions' => [],
+            'labelsTemps' => [],
+            'dataTemps' => []
+        ];
+        
+        // Données pour les graphiques
+        $statsMission = $this->getStatsMissions($entityManager);
+        $stats['labelsMissions'] = array_keys($statsMission);
+        $stats['dataMissions'] = array_values($statsMission);
+        
+        $statsTemps = $this->getStatsTemps($entityManager, $employe);
+        $stats['labelsTemps'] = array_keys($statsTemps);
+        $stats['dataTemps'] = array_values($statsTemps);
+        
+        // Récupérer tous les employés pour l'attribution
+        $employes = $entityManager->getRepository(Employes::class)->findAll();
+        
+        // Récupérer les saisies de temps récentes
+        $saisiesTemps = $entityManager->getRepository(FEUILLESTEMPS::class)
+            ->createQueryBuilder('f')
+            ->where('f.IdEmploye = :employeId')
+            ->setParameter('employeId', $employe->getId())
+            ->orderBy('f.DateTravail', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+        
+        return $this->render('dashboard/index.html.twig', [
+            'missions' => $missions,
+            'employes' => $employes,
+            'saisiesTemps' => $saisiesTemps,
+            'stats' => $stats
+        ]);
+    }
+    
+    private function calculerHeuresMois(EntityManagerInterface $entityManager, $employe): float
+    {
+        $debutMois = new \DateTime('first day of this month');
+        $finMois = new \DateTime('last day of this month');
+        
+        $result = $entityManager->getRepository(FEUILLESTEMPS::class)
+            ->createQueryBuilder('f')
+            ->select('SUM(f.HeuresEffectuees)')
+            ->where('f.IdEmploye = :employeId')
+            ->andWhere('f.DateTravail BETWEEN :debut AND :fin')
+            ->setParameter('employeId', $employe->getId())
+            ->setParameter('debut', $debutMois)
+            ->setParameter('fin', $finMois)
+            ->getQuery()
+            ->getSingleScalarResult();
+            
+        return $result ? floatval($result) : 0;
+    }
+    
+    private function compterTachesTerminees(EntityManagerInterface $entityManager, $employe): int
+    {
+        return $entityManager->createQueryBuilder()
+            ->select('COUNT(t)')
+            ->from('App\Entity\TACHES', 't')
+            ->leftJoin('t.affectations', 'a')
+            ->where('a.IdEmploye = :employeId')
+            ->andWhere('t.Statut = :statut')
+            ->setParameter('employeId', $employe->getId())
+            ->setParameter('statut', 'terminée')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
+    private function getStatsMissions(EntityManagerInterface $entityManager): array
+    {
+        $result = $entityManager->createQueryBuilder()
+            ->select('m.Statut as statut, COUNT(m) as count')
+            ->from(Missions::class, 'm')
+            ->groupBy('m.Statut')
+            ->getQuery()
+            ->getResult();
+            
+        $stats = [];
+        foreach ($result as $row) {
+            $stats[$row['statut']] = $row['count'];
+        }
+        
+        return $stats;
+    }
+    
+    private function getStatsTemps(EntityManagerInterface $entityManager, $employe): array
+    {
+        $result = $entityManager->getRepository(FEUILLESTEMPS::class)
+            ->createQueryBuilder('f')
+            ->select('m.NoMission as mission, SUM(f.HeuresEffectuees) as heures')
+            ->join('f.IdMission', 'm')
+            ->where('f.IdEmploye = :employeId')
+            ->groupBy('m.NoMission')
+            ->setParameter('employeId', $employe->getId())
+            ->orderBy('heures', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+            
+        $stats = [];
+        foreach ($result as $row) {
+            $stats[$row['mission']] = floatval($row['heures']);
+        }
+        
+        return $stats;
+    }
+}

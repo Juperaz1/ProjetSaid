@@ -1,0 +1,118 @@
+{# templates/feuille_temps/nouvelle.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle feuille de temps - Application{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 bg-light">
+    <div class="container py-4">
+        <!-- Fil d'Ariane -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_feuille_temps_index') }}" class="text-decoration-none">
+                        <i class="fas fa-clock me-1"></i>Feuilles de temps
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Nouvelle saisie</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-transparent border-0 pt-4">
+                        <h5 class="mb-0">Saisir une nouvelle feuille de temps</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ path('app_feuille_temps_sauvegarder') }}">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Mission et tâche</label>
+                                <select name="idAffectation" class="form-select" required>
+                                    <option value="">Sélectionnez une affectation</option>
+                                    {% for affectation in affectations %}
+                                        <option value="{{ affectation.IdAffectation }}">
+                                            {{ affectation.mission.NoMission }} - 
+                                            {{ affectation.mission.client.NomClient }} - 
+                                            {{ affectation.tache.LibelleTache }}
+                                            ({{ affectation.RoleMission }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Choisissez la mission et la tâche concernée</div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Date de travail</label>
+                                    <input type="date" name="dateTravail" 
+                                           class="form-control" 
+                                           value="{{ "now"|date('Y-m-d') }}"
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Heures effectuées</label>
+                                    <div class="input-group">
+                                        <input type="number" name="heures" 
+                                               class="form-control" 
+                                               step="0.5" 
+                                               min="0.5" 
+                                               max="24"
+                                               placeholder="7.5"
+                                               required>
+                                        <span class="input-group-text">heures</span>
+                                    </div>
+                                    <div class="form-text">Par pas de 0.5 heure (30 minutes)</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Description du travail effectué</label>
+                                <textarea name="description" 
+                                          class="form-control" 
+                                          rows="4"
+                                          placeholder="Décrivez brièvement le travail réalisé..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Statut</label>
+                                <div class="d-flex gap-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="statut" id="statutBrouillon" 
+                                               value="brouillon" checked>
+                                        <label class="form-check-label" for="statutBrouillon">
+                                            <span class="badge bg-secondary">Brouillon</span>
+                                            <small class="d-block text-muted">Sauvegarder pour plus tard</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="statut" id="statutSoumis" 
+                                               value="soumis">
+                                        <label class="form-check-label" for="statutSoumis">
+                                            <span class="badge bg-warning">Soumettre</span>
+                                            <small class="d-block text-muted">Envoyer pour validation</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ path('app_feuille_temps_index') }}" class="btn btn-light">
+                                    Annuler
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Enregistrer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

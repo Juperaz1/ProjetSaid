@@ -1,4 +1,11 @@
 # config/routes.yaml
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+
+# Routes pour les missions
 app_mission_index:
     path: /missions
     controller: App\Controller\MissionController::index
@@ -33,6 +40,7 @@ app_mission_delete:
     controller: App\Controller\MissionController::deleteMission
     methods: POST
 
+# Routes pour l'authentification
 app_login:
     path: /connexion
     controller: App\Controller\LoginController::login
@@ -48,12 +56,157 @@ app_register:
     controller: App\Controller\RegistrationController::register
     methods: [GET, POST]
 
+# Route pour l'accueil
 app_home:
     path: /
     controller: App\Controller\HomeController::index
     methods: GET
 
-controllers:
-    resource: ../src/Controller/
-    type: attribute
-    prefix: /
+# Routes pour les fonctionnalités du tableau de bord
+app_attribution_employe:
+    path: /attribution/employe
+    controller: App\Controller\AttributionController::assignerEmploye
+    methods: [POST]
+
+app_saisie_temps:
+    path: /saisie/temps/{idTache}
+    controller: App\Controller\TempsController::saisieTemps
+    methods: [GET, POST]
+
+app_saisie_temps_rapide:
+    path: /saisie/temps/rapide
+    controller: App\Controller\TempsController::saisieRapide
+    methods: [POST]
+
+app_saisie_temps_hebdo:
+    path: /saisie/temps/hebdo
+    controller: App\Controller\TempsController::saisieHebdomadaire
+    methods: [POST]
+
+# Routes pour les feuilles de temps
+app_feuille_temps_index:
+    path: /feuilles-temps
+    controller: App\Controller\FeuilleTempsController::index
+    methods: GET
+
+app_feuille_temps_nouvelle:
+    path: /feuille-temps/nouvelle
+    controller: App\Controller\FeuilleTempsController::nouvelle
+    methods: [GET, POST]
+
+app_feuille_temps_voir:
+    path: /feuille-temps/{id}
+    controller: App\Controller\FeuilleTempsController::voir
+    requirements:
+        id: '\d+'
+    methods: GET
+
+app_feuille_temps_editer:
+    path: /feuille-temps/{id}/editer
+    controller: App\Controller\FeuilleTempsController::editer
+    requirements:
+        id: '\d+'
+    methods: [GET, POST]
+
+app_feuille_temps_soumettre:
+    path: /feuille-temps/{id}/soumettre
+    controller: App\Controller\FeuilleTempsController::soumettre
+    requirements:
+        id: '\d+'
+    methods: POST
+
+app_feuille_temps_pdf:
+    path: /feuille-temps/{id}/pdf
+    controller: App\Controller\FeuilleTempsController::genererPdf
+    requirements:
+        id: '\d+'
+    methods: GET
+
+app_feuille_temps_supprimer:
+    path: /feuille-temps/{id}/supprimer
+    controller: App\Controller\FeuilleTempsController::supprimer
+    requirements:
+        id: '\d+'
+    methods: POST
+
+# Routes pour l'historique des missions
+app_mission_historique:
+    path: /missions/historique
+    controller: App\Controller\MissionHistoriqueController::index
+    methods: GET
+
+app_mission_historique_voir:
+    path: /missions/historique/{id}
+    controller: App\Controller\MissionHistoriqueController::voir
+    requirements:
+        id: '\d+'
+    methods: GET
+
+app_mission_historique_rapport:
+    path: /missions/historique/{id}/rapport
+    controller: App\Controller\MissionHistoriqueController::rapport
+    requirements:
+        id: '\d+'
+    methods: GET
+
+app_mission_historique_stats:
+    path: /missions/historique/stats/annee/{annee}
+    controller: App\Controller\MissionHistoriqueController::statistiques
+    requirements:
+        annee: '\d{4}'
+    methods: GET
+
+app_api_mission_taches:
+    path: /api/mission/{id}/taches
+    controller: App\Controller\ApiController::getTachesMission
+    methods: [GET]
+
+app_api_tache_employes:
+    path: /api/tache/{id}/employes-competents
+    controller: App\Controller\ApiController::getEmployesCompetents
+    methods: [GET]
+
+app_api_feuille_temps_stats:
+    path: /api/feuille-temps/stats
+    controller: App\Controller\ApiController::getFeuilleTempsStats
+    methods: GET
+
+app_api_feuille_temps_employe:
+    path: /api/feuille-temps/employe/{idEmploye}
+    controller: App\Controller\ApiController::getFeuillesTempsEmploye
+    requirements:
+        idEmploye: '\d+'
+    methods: GET
+
+app_api_mission_historique_stats:
+    path: /api/missions/historique/stats
+    controller: App\Controller\ApiController::getHistoriqueStats
+    methods: GET
+
+app_dashboard_stats:
+    path: /tableau-de-bord/stats
+    controller: App\Controller\DashboardController::statistiques
+    methods: GET
+
+# Routes de debug (AJOUTER CES LIGNES)
+app_test_debug:
+    path: /test-debug
+    controller: App\Controller\FeuilleTempsController::testDebug
+    methods: GET
+
+app_feuille_temps_debug:
+    path: /feuille-temps/debug
+    controller: App\Controller\FeuilleTempsController::debug
+    methods: GET
+
+app_feuille_temps_ajouter_test:
+    path: /feuille-temps/ajouter-test
+    controller: App\Controller\FeuilleTempsController::ajouterTest
+    methods: GET
+
+app_lier_employe:
+    path: /lier-employe/{employeId}
+    controller: App\Controller\FeuilleTempsController::lierEmploye
+    requirements:
+        employeId: '\d+'
+    methods: GET

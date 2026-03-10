@@ -356,78 +356,6 @@
     .ms-1 {
         margin-left: 0.25rem;
     }
-
-    .row.mt-4 {
-        margin-top: 2.5rem;
-    }
-
-    .col-4 {
-        flex: 0 0 33.333333%;
-        max-width: 33.333333%;
-        padding: 0 15px;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
-        transition: var(--transition);
-        border: 1px solid var(--border-color);
-        animation: fadeInUp 0.5s ease backwards;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-color);
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.1s; }
-    .stat-card:nth-child(2) { animation-delay: 0.2s; }
-    .stat-card:nth-child(3) { animation-delay: 0.3s; }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .stat-card .stat-icon {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        color: white;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 1.5rem;
-        box-shadow: 0 8px 15px rgba(67, 97, 238, 0.2);
-    }
-
-    .stat-card .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--dark-color);
-        line-height: 1.2;
-        margin-bottom: 0.25rem;
-    }
-
-    .stat-card .stat-label {
-        color: var(--gray-color);
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 500;
-    }
 </style>
 {% endblock %}
 
@@ -462,19 +390,6 @@
                     {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                         
                         <div class="mb-3">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope me-2"></i>Email professionnel
-                            </label>
-                            <input type="email" 
-                                   id="email" 
-                                   name="email" 
-                                   class="form-control" 
-                                   placeholder="votre@email.com" 
-                                   required>
-                            <div class="form-text">Votre email professionnel</div>
-                        </div>
-                        
-                        <div class="mb-3">
                             {{ form_label(registrationForm.login, 'Nom d\'utilisateur', {'label_attr': {'class': 'form-label'}}) }}
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
@@ -486,6 +401,7 @@
                                 }) }}
                             </div>
                             {{ form_errors(registrationForm.login, {'attr': {'class': 'form-error'}}) }}
+                            <div class="form-text">Votre nom d'utilisateur unique</div>
                         </div>
                         
                         <div class="mb-3">
@@ -532,9 +448,6 @@
                         </p>
                     </div>
                 </div>
-            </div>
-            
-            
             </div>
         </div>
     </div>

@@ -228,7 +228,6 @@
             outline: none;
         }
 
-        /* Style pour le bouton du formulaire de connexion - NE CHANGE PAS au survol */
         .btn-primary {
             background-color: var(--primary-color) !important;
             border-color: var(--primary-color) !important;
@@ -262,6 +261,7 @@
             background: rgba(255, 255, 255, 0.15);
             padding: 0.5rem 1.2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
         }
 
         .user-badge i {
@@ -468,8 +468,25 @@
                         <div class="user-badge">
                             <i class="fas fa-user-circle"></i>
                             <div class="user-info">
-                                <span class="user-name">{{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}</span>
-                                <span class="user-role">Administrateur</span>
+                                {% if app.user.employe %}
+                                    <span class="user-name">{{ app.user.employe.prenomEmploye }} {{ app.user.employe.nomEmploye }}</span>
+                                    <span class="user-role">
+                                        {% if 'ROLE_RESPONSABLE' in app.user.roles %}
+                                            Responsable
+                                        {% else %}
+                                            Utilisateur
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="user-name">{{ app.user.login }}</span>
+                                    <span class="user-role">
+                                        {% if 'ROLE_RESPONSABLE' in app.user.roles %}
+                                            Responsable
+                                        {% else %}
+                                            Utilisateur
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                         <a class="btn btn-logout" href="{{ path('app_logout') }}">

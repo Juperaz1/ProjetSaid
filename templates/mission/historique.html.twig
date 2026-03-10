@@ -1,0 +1,188 @@
+{# templates/mission/historique.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des missions - Application{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 bg-light">
+    <!-- En-tête -->
+    <div class="bg-white border-bottom">
+        <div class="container py-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <h1 class="h2 mb-1">Historique des missions</h1>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-history me-2"></i>Consultez toutes vos missions passées et terminées
+                    </p>
+                </div>
+                <div>
+                    <a href="{{ path('app_mission_index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Missions en cours
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres avancés -->
+    <div class="container py-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Période</label>
+                        <select name="annee" class="form-select">
+                            <option value="">Toutes les années</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small text-muted">Client</label>
+                        <select name="client" class="form-select">
+                            <option value="">Tous les clients</option>
+                            {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.nomClient }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small text-muted">Type de mission</label>
+                        <select name="type" class="form-select">
+                            <option value="">Tous les types</option>
+                            {% for type in typesMissions %}
+                                <option value="{{ type.id }}">{{ type.libelleTypeMission }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search me-2"></i>Rechercher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Liste des missions historiques -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4">
+                <h5 class="mb-0">Missions terminées</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="accordionMissions">
+                    {% for annee, missionsAnnee in missionsParAnnee %}
+                    <div class="accordion-item border-0 mb-3">
+                        <h2 class="accordion-header" id="heading{{ annee }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %} bg-light rounded" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ annee }}">
+                                <span class="fw-bold">{{ annee }}</span>
+                                <span class="badge bg-primary ms-3">{{ missionsAnnee|length }} mission(s)</span>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ annee }}" 
+                             class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                             data-bs-parent="#accordionMissions">
+                            <div class="accordion-body px-0">
+                                {% for mission in missionsAnnee %}
+                                <div class="card border-0 bg-light mb-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                                                    <h6 class="mb-0">{{ mission.noMission }}</h6>
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                                        {{ mission.typeMission.libelleTypeMission }}
+                                                    </span>
+                                                    <span class="badge bg-info bg-opacity-10 text-info">
+                                                        <i class="fas fa-building me-1"></i>{{ mission.client.nomClient }}
+                                                    </span>
+                                                </div>
+                                                
+                                                <p class="text-muted small mb-2">
+                                                    {{ mission.description|slice(0, 150) }}...
+                                                </p>
+                                                
+                                                <div class="d-flex flex-wrap gap-3 small">
+                                                    <span>
+                                                        <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                                        {{ mission.dateDebut|date('d/m/Y') }} - {{ mission.dateFinPrevue|date('d/m/Y') }}
+                                                    </span>
+                                                    <span>
+                                                        <i class="fas fa-euro-sign me-1 text-muted"></i>
+                                                        {{ mission.budgetEuro|number_format(0, ',', ' ') }} €
+                                                    </span>
+                                                    <span>
+                                                        <i class="fas fa-clock me-1 text-muted"></i>
+                                                        {{ mission.heuresReelles }}h / {{ mission.budgetHeures }}h
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="d-flex flex-column align-items-end">
+                                                    <div class="mb-2">
+                                                        <span class="badge bg-success px-3 py-2">
+                                                            <i class="fas fa-check-circle me-1"></i>{{ mission.statut|capitalize }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="/missions/historique/mission/{{ mission.id }}" 
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye me-1"></i>Détails
+                                                        </a>
+                                                        <a href="/missions/historique/mission/{{ mission.id }}/rapport" 
+                                                           class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-file-pdf me-1"></i>Rapport
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {# CORRECTION : Vérification de l'existence des affectations #}
+                                        {% if mission.taches is defined and mission.taches|length > 0 %}
+                                            <!-- Équipe de la mission basée sur les tâches -->
+                                            <div class="mt-3 pt-3 border-top">
+                                                <small class="text-muted d-block mb-2">
+                                                    <i class="fas fa-tasks me-1"></i>Tâches de la mission :
+                                                </small>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    {% for tache in mission.taches %}
+                                                        <span class="badge bg-white text-dark border px-3 py-2">
+                                                            {{ tache.libelleTache }}
+                                                            <small class="text-muted ms-1">({{ tache.statut }})</small>
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {# Alternative : Si vous voulez afficher les employés via les affectations #}
+                                        {% if mission.id is defined %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Pour voir l'équipe complète, consultez les détails de la mission.
+                                                </small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>Aucune mission terminée trouvée.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

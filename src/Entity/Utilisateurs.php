@@ -6,7 +6,6 @@ use App\Repository\UtilisateursRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UtilisateursRepository::class)]
 #[ORM\Table(name: "UTILISATEURS")]
@@ -27,7 +26,8 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: "IdEmploye", referencedColumnName: "IdEmploye", nullable: true)]
     private ?Employes $employe = null;
 
-    #[Assert\IsTrue(message: 'Vous devez accepter les conditions d\'utilisation.')]
+    private ?string $plainPassword = null;
+
     private bool $agreeTerms = false;
 
     public function getId(): ?int
@@ -68,6 +68,17 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
     public function getRoles(): array
     {
         $roles = ['ROLE_USER'];
@@ -81,6 +92,7 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
+        $this->plainPassword = null;
     }
 
     public function getUserIdentifier(): string
@@ -97,5 +109,21 @@ class Utilisateurs implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->agreeTerms = $agreeTerms;
         return $this;
+    }
+
+    public function getDisplayName(): string
+    {
+        if ($this->employe) {
+            return $this->employe->getPrenomEmploye() . ' ' . $this->employe->getNomEmploye();
+        }
+        return $this->login;
+    }
+
+    public function getDisplayRole(): string
+    {
+        if (in_array('ROLE_RESPONSABLE', $this->getRoles())) {
+            return 'Responsable';
+        }
+        return 'Utilisateur';
     }
 }
