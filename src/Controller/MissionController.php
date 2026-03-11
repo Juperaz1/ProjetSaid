@@ -11,7 +11,7 @@ use App\Entity\TachesCompetences;
 use App\Entity\Affectation;
 use App\Repository\ClientRepository;
 use App\Repository\TypeMissionRepository;
-use App\Repository\EmployeRepository;
+use App\Repository\EmployesRepository;
 use App\Repository\CompetenceRepository;
 use App\Repository\MissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -136,7 +136,7 @@ class MissionController extends AbstractController
         EntityManagerInterface $entityManager, 
         ClientRepository $clientRepository, 
         TypeMissionRepository $typeMissionRepository, 
-        EmployeRepository $employeRepository, 
+        EmployesRepository $employeRepository, 
         CompetenceRepository $competenceRepository
     ): Response
     {
@@ -349,7 +349,7 @@ class MissionController extends AbstractController
 
     #[Route('/mission/tache/{id}/assigner', name: 'app_mission_tache_assigner', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function assignerTache(int $id, Request $request, EntityManagerInterface $entityManager, EmployeRepository $employeRepository): Response
+    public function assignerTache(int $id, Request $request, EntityManagerInterface $entityManager, EmployesRepository $employeRepository): Response
     {
         $tache = $entityManager->getRepository(Tache::class)->find($id);
         if (!$tache) {
@@ -389,7 +389,7 @@ class MissionController extends AbstractController
         EntityManagerInterface $entityManager, 
         ClientRepository $clientRepository, 
         TypeMissionRepository $typeMissionRepository, 
-        EmployeRepository $employeRepository, 
+        EmployesRepository $employeRepository, 
         CompetenceRepository $competenceRepository
     ): Response
     {
